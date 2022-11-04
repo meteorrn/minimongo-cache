@@ -7,7 +7,7 @@
  */
 // Utilities for db handling
 const _ = require("lodash");
-const { pluck, rest, first } = require('../lib/utils')
+const { pluck, rest, first, last } = require('../lib/utils')
 const { compileDocumentSelector } = require("./selector");
 const { compileSort } = require("./selector");
 
@@ -104,7 +104,7 @@ exports.filterFields = function filterFields(items, fields) {
         }
 
         // Copy value
-        to[_.last(path)] = from[_.last(path)];
+        to[last(path)] = from[last(path)];
       }
 
       return newItem;
@@ -126,7 +126,7 @@ exports.filterFields = function filterFields(items, fields) {
           continue;
         }
 
-        delete obj[_.last(path)];
+        delete obj[last(path)];
       }
 
       return item;
@@ -207,7 +207,7 @@ var processNearOperator = function (selector, list) {
 const pointInPolygon = function (point, polygon) {
   // Check that first == last
   if (
-    !_.isEqual(first(polygon.coordinates[0]), _.last(polygon.coordinates[0]))
+    !_.isEqual(first(polygon.coordinates[0]), last(polygon.coordinates[0]))
   ) {
     throw new Error("First must equal last");
   }
