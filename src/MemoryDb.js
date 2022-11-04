@@ -158,7 +158,7 @@ class Collection {
     for (let item of Array.from(items)) {
       // Shallow copy since MemoryDb adds _version to the document.
       // TODO: should we get rid of this mutation?
-      const doc = _.assign({}, this.items[item.doc._id] || {}, item.doc);
+      const doc = Object.assign({}, this.items[item.doc._id] || {}, item.doc);
 
       // Replace/add
       this.items[item.doc._id] = doc;

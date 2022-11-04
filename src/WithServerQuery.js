@@ -27,7 +27,7 @@ class ServerQuery {
   }
 
   setState(updates) {
-    const mergedState = _.assign({}, this.state, updates);
+    const mergedState = Object.assign({}, this.state, updates);
     const cb = () => {
       this.cache.serverQueries.upsert({
         _id: this.key,
