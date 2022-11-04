@@ -22,7 +22,7 @@ exports.compileDocumentSelector = compileDocumentSelector;
  * @return {*|Array}
  */
 exports.processFind = function processFind(items, selector, options) {
-  const values = _.values(items);
+  const values = Object.values(items);
   let filtered = values.filter(compileDocumentSelector(selector));
 
   // Handle geospatial operators
@@ -75,7 +75,7 @@ exports.filterFields = function filterFields(items, fields) {
 
     // TODO move this check out of map to increase performance
     // TODO: const inclusive = first(_.values(fields)) === 1
-    if (first(_.values(fields)) === 1) {
+    if (first(Object.values(fields)) === 1) {
       // Include fields
       for (field of Array.from(_.keys(fields).concat(["_id"]))) {
         path = field.split(".");
