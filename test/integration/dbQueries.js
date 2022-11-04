@@ -10,7 +10,7 @@
 const { tickAsync } = require("../helpers/tickAsync");
 const MemoryDb = require("../../src/MemoryDb");
 const _ = require("lodash");
-const { pluck } = require('../../lib/utils');
+const { pluck } = require('../../src/tools');
 const chai = require("chai");
 const { assert } = chai;
 

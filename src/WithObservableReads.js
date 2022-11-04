@@ -4,9 +4,8 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 const ReadTransaction = require("./ReadTransaction");
-
-const _ = require("lodash");
-
+const { arraysAreEqual } = require('./tools');
+const _ = require('lodash');
 class ObservableRead {
   constructor(db, func, context) {
     this.db = db;
@@ -41,7 +40,7 @@ class ObservableRead {
     // If we read different data this time, notify of a change. This saves render() time
     if (
       !this.lastReadTransaction ||
-      !_.isEqual(this.lastReadTransaction.log, nextReadTransaction.log)
+      !arraysAreEqual(this.lastReadTransaction.log, nextReadTransaction.log)
     ) {
       this.lastReadTransaction = nextReadTransaction;
       const prevValue = this.lastValue;

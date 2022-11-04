@@ -16,7 +16,7 @@ const WithServerQuery = require("./WithServerQuery");
 const _ = require("lodash");
 const utils = require("./utils");
 const { processFind } = require("./utils");
-const { hasOwn } = require('../lib/utils')
+const { hasOwn } = require('./tools')
 
 // TODO: use ImmutableJS (requires changing selector.js which will
 // be painful). This will also let us do MVCC.
