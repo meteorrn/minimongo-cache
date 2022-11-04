@@ -69,7 +69,7 @@ exports.filterFields = function filterFields(items, fields) {
   // TODO throw if fields contain both inclusive and exclusive criteria
 
   // For each item
-  return _.map(items, function (item) {
+  return items.map((item)  => {
     let field, from, obj, path, pathElem;
     const newItem = {};
 
@@ -165,7 +165,7 @@ var processNearOperator = function (selector, list) {
       list = list.filter((doc) => doc[key] && doc[key].type === "Point");
 
       // Get distances
-      let distances = _.map(list, (doc) => ({
+      let distances = list.map((doc) => ({
         doc,
 
         distance: getDistanceFromLatLngInM(
@@ -212,43 +212,30 @@ const pointInPolygon = function (point, polygon) {
     throw new Error("First must equal last");
   }
 
+  const coordinates = (polygon.coordinates[0] || []);
+  const firstCoordinates = coordinates.map((coord) => coord[0]);
+  const firstPoint = point.coordinates[0];
+  const secondPoint = point.coordinates[1];
+
   // Check bounds
-  if (
-    point.coordinates[0] <
-    Math.min.apply(
-      this,
-      _.map(polygon.coordinates[0], (coord) => coord[0])
-    )
-  ) {
+  if (firstPoint < Math.min.apply(this, firstCoordinates)) {
     return false;
   }
-  if (
-    point.coordinates[1] <
-    Math.min.apply(
-      this,
-      _.map(polygon.coordinates[0], (coord) => coord[1])
-    )
-  ) {
+
+  const secondCoordinates = coordinates.map((coord) => coord[1]);
+
+  if (secondPoint < Math.min.apply(this, secondCoordinates)) {
     return false;
   }
-  if (
-    point.coordinates[0] >
-    Math.max.apply(
-      this,
-      _.map(polygon.coordinates[0], (coord) => coord[0])
-    )
-  ) {
+
+  if (firstPoint > Math.max.apply(this, firstCoordinates)) {
     return false;
   }
-  if (
-    point.coordinates[1] >
-    Math.max.apply(
-      this,
-      _.map(polygon.coordinates[0], (coord) => coord[1])
-    )
-  ) {
+
+  if (secondPoint > Math.max.apply(this, secondCoordinates)) {
     return false;
   }
+
   return true;
 };
 
@@ -344,7 +331,7 @@ exports.regularizeUpsert = function regularizeUpsert(
   }
 
   // Make into list of { doc: .., base: }
-  const items = _.map(docs, (doc, i) => ({
+  const items = docs.map((doc, i) => ({
     doc,
     base: i < bases.length ? bases[i] : undefined,
   }));
