@@ -22,24 +22,21 @@ licenses, included below:
 
 const LocalCollection = {};
 const EJSON = require("./EJSON");
-const { hasProp, emptyArray } = require('./helpers');
+const { hasProp, emptyArray } = require("./helpers");
 
 // Like Array.isArray, but doesn't regard polyfilled Uint8Arrays on old browsers as
 // arrays.
-const isArray = x => Array.isArray(x) && !EJSON.isBinary(x);
+const isArray = (x) => Array.isArray(x) && !EJSON.isBinary(x);
 
-const _anyIfArray = (x, f) => isArray(x)
-  ? x.some(el => f(el))
-  : f(x);
+const _anyIfArray = (x, f) => (isArray(x) ? x.some((el) => f(el)) : f(x));
 
-const _anyIfArrayPlus = (x, f) => f(x)
-  ? true
-  : isArray(x) && x.some(el => f(el));
+const _anyIfArrayPlus = (x, f) =>
+  f(x) ? true : isArray(x) && x.some((el) => f(el));
 
 const hasOperators = (valueSelector) => {
   let theseAreOperators = undefined;
 
-  Object.keys(valueSelector).forEach(selKey => {
+  Object.keys(valueSelector).forEach((selKey) => {
     const thisIsOperator = selKey.substr(0, 1) === "$";
 
     if (theseAreOperators === undefined) {
@@ -47,35 +44,38 @@ const hasOperators = (valueSelector) => {
     } else if (theseAreOperators !== thisIsOperator) {
       throw new Error("Inconsistent selector: " + valueSelector);
     }
-  })
+  });
   return !!theseAreOperators; // {} has no operators
 };
-
 
 const compileValueSelector = (valueSelector) => {
   if (valueSelector == null) {
     // undefined or null
-    return value => _anyIfArray(value, x => x === undefined || x === null);
+    return (value) => _anyIfArray(value, (x) => x === undefined || x === null);
   }
 
   // Arrays match either identical arrays or arrays that contain it as a value.
   if (isArray(valueSelector)) {
-    return value => isArray(value)
-      ? _anyIfArrayPlus(value, x => LocalCollection._f._equal(valueSelector, x))
-      : false
+    return (value) =>
+      isArray(value)
+        ? _anyIfArrayPlus(value, (x) =>
+            LocalCollection._f._equal(valueSelector, x)
+          )
+        : false;
   }
 
   // test for instanceof before checking if is object to avoid false-positives
   // when passing a RegExp instance to this one
   if (valueSelector instanceof RegExp) {
-    return value => value !== undefined
-      ? _anyIfArray(value, x => valueSelector.test(x))
-      : false
+    return (value) =>
+      value !== undefined
+        ? _anyIfArray(value, (x) => valueSelector.test(x))
+        : false;
   }
 
   // Selector is a non-null primitive (and not an array or RegExp either).
-  if (typeof valueSelector !== 'object') {
-    return value => _anyIfArray(value, x => x === valueSelector);
+  if (typeof valueSelector !== "object") {
+    return (value) => _anyIfArray(value, (x) => x === valueSelector);
   }
 
   // It's an object, but not an array or regexp.
@@ -91,128 +91,130 @@ const compileValueSelector = (valueSelector) => {
       operatorFunctions.push(opFn(operand, valueSelector.$options));
     });
 
-    return value => operatorFunctions.every(f => f(value));
+    return (value) => operatorFunctions.every((f) => f(value));
   }
 
   // It's a literal; compare value (or element of value array) directly to the
   // selector.
-  return value =>_anyIfArray(value, x => LocalCollection._f._equal(valueSelector, x));
+  return (value) =>
+    _anyIfArray(value, (x) => LocalCollection._f._equal(valueSelector, x));
 };
 
 // XXX can factor out common logic below
 const LOGICAL_OPERATORS = {
-  $and (subSelector) {
+  $and(subSelector) {
     if (!isArray(subSelector) || emptyArray(subSelector)) {
       throw Error("$and/$or/$nor must be nonempty array");
     }
 
     const subSelectorFunctions = subSelector.map(compileDocumentSelector);
-    return doc => subSelectorFunctions.every(fn => fn(doc));
+    return (doc) => subSelectorFunctions.every((fn) => fn(doc));
   },
 
-  $or (subSelector) {
+  $or(subSelector) {
     if (!isArray(subSelector) || emptyArray(subSelector)) {
       throw Error("$and/$or/$nor must be nonempty array");
     }
 
     const subSelectorFunctions = subSelector.map(compileDocumentSelector);
-    return doc => subSelectorFunctions.some(fn => fn(doc));
+    return (doc) => subSelectorFunctions.some((fn) => fn(doc));
   },
 
-  $nor (subSelector) {
+  $nor(subSelector) {
     if (!isArray(subSelector) || emptyArray(subSelector)) {
       throw Error("$and/$or/$nor must be nonempty array");
     }
 
     const subSelectorFunctions = subSelector.map(compileDocumentSelector);
-    return doc => subSelectorFunctions.every(f => !f(doc));
+    return (doc) => subSelectorFunctions.every((f) => !f(doc));
   },
 
-  $where (selectorValue) {
+  $where(selectorValue) {
     if (!(selectorValue instanceof Function)) {
       // NOTE: replaced Function("return " + selectorValue); with
       // a closure to avoid any eval issues at all
       selectorValue = () => selectorValue;
     }
-    return doc => selectorValue.call(doc);
+    return (doc) => selectorValue.call(doc);
   },
 };
 
 const VALUE_OPERATORS = {
-  $in (operand) {
+  $in(operand) {
     if (!isArray(operand)) {
       throw new Error("Argument to $in must be array");
     }
 
-    const opFn = x => operand.some(el => LocalCollection._f._equal(el, x))
-    return value => _anyIfArrayPlus(value, opFn)
+    const opFn = (x) => operand.some((el) => LocalCollection._f._equal(el, x));
+    return (value) => _anyIfArrayPlus(value, opFn);
   },
 
-  $all (operand) {
+  $all(operand) {
     if (!isArray(operand)) {
       throw new Error("Argument to $all must be array");
     }
 
-    return value => isArray(value)
-      ? operand.every(opEl => value.some(valEl => LocalCollection._f._equal(opEl, valEl)))
-      : false
+    return (value) =>
+      isArray(value)
+        ? operand.every((opEl) =>
+            value.some((valEl) => LocalCollection._f._equal(opEl, valEl))
+          )
+        : false;
   },
 
-  $lt (operand) {
-    const opFn = x => LocalCollection._f._cmp(x, operand) < 0
-    return value => _anyIfArray(value, opFn);
+  $lt(operand) {
+    const opFn = (x) => LocalCollection._f._cmp(x, operand) < 0;
+    return (value) => _anyIfArray(value, opFn);
   },
 
-  $lte (operand) {
-    const opFn = x => LocalCollection._f._cmp(x, operand) <= 0;
-    return value => _anyIfArray(value, opFn);
+  $lte(operand) {
+    const opFn = (x) => LocalCollection._f._cmp(x, operand) <= 0;
+    return (value) => _anyIfArray(value, opFn);
   },
 
-  $gt (operand) {
-    const opFn = x => LocalCollection._f._cmp(x, operand) > 0;
-    return value => _anyIfArray(value, opFn);
+  $gt(operand) {
+    const opFn = (x) => LocalCollection._f._cmp(x, operand) > 0;
+    return (value) => _anyIfArray(value, opFn);
   },
 
-  $gte (operand) {
-    const opFn = x => LocalCollection._f._cmp(x, operand) >= 0;
-    return value => _anyIfArray(value, opFn);
+  $gte(operand) {
+    const opFn = (x) => LocalCollection._f._cmp(x, operand) >= 0;
+    return (value) => _anyIfArray(value, opFn);
   },
 
-  $ne (operand) {
-    const opFn = x => LocalCollection._f._equal(x, operand)
-    return value => !_anyIfArrayPlus(value, opFn);
+  $ne(operand) {
+    const opFn = (x) => LocalCollection._f._equal(x, operand);
+    return (value) => !_anyIfArrayPlus(value, opFn);
   },
 
-  $nin (operand) {
+  $nin(operand) {
     if (!isArray(operand)) {
       throw new Error("Argument to $nin must be array");
     }
 
     const inFunction = VALUE_OPERATORS.$in(operand);
-    return value => (value !== undefined)
-      ? !inFunction(value)
-      : true; // Field doesn't exist, so it's not-in operand
+    return (value) => (value !== undefined ? !inFunction(value) : true); // Field doesn't exist, so it's not-in operand
   },
 
-  $exists (operand) {
-    return value => operand === (value !== undefined);
+  $exists(operand) {
+    return (value) => operand === (value !== undefined);
   },
 
-  $mod (operand) {
+  $mod(operand) {
     const divisor = operand[0];
     const remainder = operand[1];
 
-    const opFn = x => x % divisor === remainder;
-    return value => _anyIfArray(value, opFn);
+    const opFn = (x) => x % divisor === remainder;
+    return (value) => _anyIfArray(value, opFn);
   },
 
-  $size (operand) {
-    return value => isArray(value) && operand === value.length;
+  $size(operand) {
+    return (value) => isArray(value) && operand === value.length;
   },
 
   $type: function (operand) {
-    const opFn = x => LocalCollection._f._type(x) === operand;
-    return value => {
+    const opFn = (x) => LocalCollection._f._type(x) === operand;
+    return (value) => {
       // A nonexistent field is of no type.
       if (value === undefined) return false;
       // Definitely not _anyIfArrayPlus: $type: 4 only matches arrays that have
@@ -222,7 +224,7 @@ const VALUE_OPERATORS = {
     };
   },
 
-  $regex (operand, options) {
+  $regex(operand, options) {
     if (options !== undefined) {
       // Options passed in $options (even the empty string) always overrides
       // options in the RegExp object itself.
@@ -234,56 +236,50 @@ const VALUE_OPERATORS = {
         throw new Error("Only the i, m, and g regexp options are supported");
       }
 
-      const regexSource = operand instanceof RegExp
-        ? operand.source
-        : operand;
+      const regexSource = operand instanceof RegExp ? operand.source : operand;
       operand = new RegExp(regexSource, options);
     } else if (!(operand instanceof RegExp)) {
       operand = new RegExp(operand);
     }
 
-    const opFn = x => operand.test(x);
-    return value => (value !== undefined)
-      ? _anyIfArray(value, opFn)
-      : false;
+    const opFn = (x) => operand.test(x);
+    return (value) => (value !== undefined ? _anyIfArray(value, opFn) : false);
   },
 
-  $options (/* operand */) {
+  $options(/* operand */) {
     // evaluation happens at the $regex function above
     return (/* value */) => true;
   },
 
-  $elemMatch (operand) {
+  $elemMatch(operand) {
     const matcher = compileDocumentSelector(operand);
-    const matchFn = x => matcher(x);
-    return value => isArray(value)
-      ? value.some(matchFn)
-      : false;
+    const matchFn = (x) => matcher(x);
+    return (value) => (isArray(value) ? value.some(matchFn) : false);
   },
 
-  $not (operand) {
+  $not(operand) {
     const matcher = compileValueSelector(operand);
-    return value => !matcher(value);
+    return (value) => !matcher(value);
   },
 
-  $near (/* operand */) {
+  $near(/* operand */) {
     // Always returns true. Must be handled in post-filter/sort/limit
     return (/* value */) => true;
   },
 
-  $geoIntersects (/* operand */) {
+  $geoIntersects(/* operand */) {
     // Always returns true. Must be handled in post-filter/sort/limit
     return (/* value */) => true;
   },
 };
 
 // XXX: extracted, since this is created many times during recursion
-const toArray = obj => {
+const toArray = (obj) => {
   const ret = [];
   Object.entries(obj).forEach(([key, value]) => {
     ret.push(key);
     ret.push(value);
-  })
+  });
   return ret;
 };
 
@@ -291,7 +287,7 @@ const toArray = obj => {
 LocalCollection._f = {
   // XXX for _all and _in, consider building 'inquery' at compile time..
 
-  _type (v) {
+  _type(v) {
     if (typeof v === "number") return 1;
     if (typeof v === "string") return 2;
     if (typeof v === "boolean") return 8;
@@ -316,13 +312,13 @@ LocalCollection._f = {
   },
 
   // deep equality test: use for literal document and array matches
-  _equal (a, b) {
+  _equal(a, b) {
     return EJSON.equals(a, b, { keyOrderSensitive: true });
   },
 
   // maps a type code to a value that can be used to sort values of
   // different types
-  _typeorder (t) {
+  _typeorder(t) {
     // http://www.mongodb.org/display/DOCS/What+is+the+Compare+Order+for+BSON+Types
     // XXX what is the correct sort position for Javascript code?
     // ('100' in the matrix below)
@@ -354,7 +350,7 @@ LocalCollection._f = {
   // semantics. (as an extension, consider 'undefined' to be less than
   // any other value.) return negative if a is less, positive if b is
   // less, or 0 if equal
-  _cmp (a, b) {
+  _cmp(a, b) {
     if (a === undefined) return b === undefined ? 0 : -1;
     if (b === undefined) return 1;
     let ta = LocalCollection._f._type(a);
@@ -396,9 +392,7 @@ LocalCollection._f = {
     }
     if (ta === 4) {
       // Array
-      const max = a.length > b.length
-        ? a.length
-        : b.length;
+      const max = a.length > b.length ? a.length : b.length;
 
       for (let i = 0; i < max; i++) {
         if (i === a.length) return i === b.length ? 0 : -1;
@@ -479,7 +473,7 @@ LocalCollection._makeLookupFunction = function (key) {
     nextIsNumeric = /^\d+(\.|$)/.test(rest);
   }
 
-  return doc => {
+  return (doc) => {
     if (doc == null) {
       // null or undefined
       return [undefined];
@@ -529,7 +523,7 @@ const compileDocumentSelector = function compileDocumentSelector(docSelector) {
     } else {
       const lookUpByIndex = LocalCollection._makeLookupFunction(key);
       const valueSelectorFunc = compileValueSelector(subSelector);
-      perKeySelectors.push(doc => {
+      perKeySelectors.push((doc) => {
         const branchValues = lookUpByIndex(doc);
         // We apply the selector to each "branched" value and return true if any
         // match. This isn't 100% consistent with MongoDB; eg, see:
@@ -539,7 +533,7 @@ const compileDocumentSelector = function compileDocumentSelector(docSelector) {
     }
   });
 
-  return doc => perKeySelectors.every(f => f(doc));
+  return (doc) => perKeySelectors.every((f) => f(doc));
 };
 
 /**
@@ -578,7 +572,7 @@ LocalCollection._compileSort = function compileSort(spec) {
       }
     }
   } else if (typeof spec === "object" && spec !== null) {
-    Object.keys(spec).forEach(key => {
+    Object.keys(spec).forEach((key) => {
       sortSpecParts.push({
         lookup: LocalCollection._makeLookupFunction(key),
         ascending: spec[key] >= 0,
@@ -614,7 +608,7 @@ LocalCollection._compileSort = function compileSort(spec) {
         branchValue = [undefined];
       }
 
-      branchValue.forEach(value => {
+      branchValue.forEach((value) => {
         // We should get here at least once: lookup functions return non-empty
         // arrays, so the outer loop runs at least once, and we prevented
         // branchValue from being an empty array.
@@ -640,9 +634,7 @@ LocalCollection._compileSort = function compileSort(spec) {
       const compare = LocalCollection._f._cmp(aValue, bValue);
 
       if (compare !== 0) {
-        return specPart.ascending
-          ? compare
-          : -compare;
+        return specPart.ascending ? compare : -compare;
       }
     }
     return 0;

@@ -3,10 +3,9 @@
 // so there are no extra deps when using rn
 // also, base64-js is fully js and browser-compatible
 const base64 = require("base64-js");
-const { hasProp, objSize, isArguments } = require('./helpers')
+const { hasProp, objSize, isArguments } = require("./helpers");
 const EJSON = {}; // Global!
 const customTypes = new Map();
-
 
 /**
  * Add a custom type, using a method of your choice to get to and
@@ -71,11 +70,13 @@ const builtinConverters = [
       if (obj === null || obj === undefined) {
         return false;
       }
-      const size = objSize(obj)
+      const size = objSize(obj);
       if (size === 0 || size > 2) {
         return false;
       }
-      return builtinConverters.some(converter => converter.matchJSONValue(obj));
+      return builtinConverters.some((converter) =>
+        converter.matchJSONValue(obj)
+      );
     },
     toJSONValue: function (obj) {
       const newObj = {};
@@ -95,7 +96,9 @@ const builtinConverters = [
   {
     // Custom
     matchJSONValue: function (obj) {
-      return hasProp(obj, "$type") && hasProp(obj, "$value") && objSize(obj) === 2;
+      return (
+        hasProp(obj, "$type") && hasProp(obj, "$value") && objSize(obj) === 2
+      );
     },
     matchObject: function (obj) {
       return EJSON._isCustomType(obj);
@@ -210,10 +213,12 @@ const adjustTypesFromJSONValue = (EJSON._adjustTypesFromJSONValue = function (
 // EJSON.fromJSONValue
 const fromJSONValueHelper = function (value) {
   if (typeof value === "object" && value !== null) {
-    const keys = Object.keys(value)
+    const keys = Object.keys(value);
 
-    if (keys.length <= 2 &&
-      keys.every(k => typeof k === "string" && k.substr(0, 1) === "$")) {
+    if (
+      keys.length <= 2 &&
+      keys.every((k) => typeof k === "string" && k.substr(0, 1) === "$")
+    ) {
       for (const converter of builtinConverters) {
         if (converter.matchJSONValue(value)) {
           return converter.fromJSONValue(value);
@@ -370,7 +375,7 @@ EJSON.clone = function clone(v) {
     // For some reason, _.map doesn't work in this context on Opera (weird test
     // failures).
     // TODO test with newer opera
-    return v.map(entry => EJSON.clone(entry));
+    return v.map((entry) => EJSON.clone(entry));
   }
   // handle general user-defined typed Objects if they have a clone method
   if (typeof v.clone === "function") {
