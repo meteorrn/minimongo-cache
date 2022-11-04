@@ -41,6 +41,10 @@ const arraysAreEqual = (a, b) => {
  */
 const rest = (list, n) => list.slice(n, list.length);
 
+const sortBy = (key) => {
+  return (a, b) => (a[key] > b[key]) ? 1 : ((b[key] > a[key]) ? -1 : 0);
+};
+
 module.exports = {
   hasOwn,
   pluck,
@@ -48,5 +52,6 @@ module.exports = {
   last,
   rest,
   initial,
-  arraysAreEqual
+  arraysAreEqual,
+  sortBy
 };

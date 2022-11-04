@@ -7,7 +7,7 @@
  */
 // Utilities for db handling
 const _ = require("lodash");
-const { pluck, rest, first, last, initial, arraysAreEqual } = require('./tools')
+const { pluck, rest, first, last, initial, arraysAreEqual, sortBy } = require('./tools')
 const { compileDocumentSelector } = require("./selector");
 const { compileSort } = require("./selector");
 
@@ -180,7 +180,7 @@ var processNearOperator = function (selector, list) {
       distances = distances.filter((item) => item.distance >= 0);
 
       // Sort by distance
-      distances = _.sortBy(distances, "distance");
+      distances = distances.sort(sortBy("distance"));
 
       // Filter by maxDistance
       if (value["$near"]["$maxDistance"]) {
