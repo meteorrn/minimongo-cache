@@ -7,7 +7,7 @@
  */
 // Utilities for db handling
 const _ = require("lodash");
-const { pluck } = require('../lib/utils')
+const { pluck, rest } = require('../lib/utils')
 const { compileDocumentSelector } = require("./selector");
 const { compileSort } = require("./selector");
 
@@ -34,7 +34,7 @@ exports.processFind = function processFind(items, selector, options) {
   }
 
   if (options && options.skip) {
-    filtered = _.rest(filtered, options.skip);
+    filtered = rest(filtered, options.skip);
   }
 
   if (options && options.limit) {
