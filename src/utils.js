@@ -336,7 +336,7 @@ exports.regularizeUpsert = function regularizeUpsert(
   }
 
   // Handle single upsert
-  if (!_.isArray(docs)) {
+  if (!Array.isArray(docs)) {
     docs = [docs];
     bases = [bases];
   } else {
