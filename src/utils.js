@@ -7,7 +7,7 @@
  */
 // Utilities for db handling
 const _ = require("lodash");
-
+const { pluck } = require('../lib/utils');
 const { compileDocumentSelector } = require("./selector");
 const { compileSort } = require("./selector");
 
@@ -193,7 +193,7 @@ var processNearOperator = function (selector, list) {
       distances = _.first(distances, 100);
 
       // Extract docs
-      list = _.pluck(distances, "doc");
+      list = pluck(distances, "doc");
     }
   }
   return list;

@@ -10,6 +10,7 @@
 const { tickAsync } = require("../helpers/tickAsync");
 const MemoryDb = require("../../src/MemoryDb");
 const _ = require("lodash");
+const { pluck } = require('../../lib/utils');
 const chai = require("chai");
 const { assert } = chai;
 
@@ -38,7 +39,7 @@ module.exports = function () {
     // Test a filter to return specified rows (in order)
     return (this.testFilter = function (filter, ids, done) {
       const results = this.col.find(filter, { sort: ["_id"] });
-      assert.deepEqual(_.pluck(results, "_id"), ids);
+      assert.deepEqual(pluck(results, "_id"), ids);
       return done();
     });
   });
@@ -481,25 +482,25 @@ module.exports = function () {
 
     it("sorts ascending", function (done) {
       const results = this.col.find({}, { sort: ["a"] });
-      assert.deepEqual(_.pluck(results, "_id"), ["1", "3", "2"]);
+      assert.deepEqual(pluck(results, "_id"), ["1", "3", "2"]);
       return done();
     });
 
     it("sorts descending", function (done) {
       const results = this.col.find({}, { sort: [["a", "desc"]] });
-      assert.deepEqual(_.pluck(results, "_id"), ["2", "3", "1"]);
+      assert.deepEqual(pluck(results, "_id"), ["2", "3", "1"]);
       return done();
     });
 
     it("limits", function (done) {
       const results = this.col.find({}, { sort: ["a"], limit: 2 });
-      assert.deepEqual(_.pluck(results, "_id"), ["1", "3"]);
+      assert.deepEqual(pluck(results, "_id"), ["1", "3"]);
       return done();
     });
 
     it("skips", function (done) {
       const results = this.col.find({}, { sort: ["a"], skip: 2 });
-      assert.deepEqual(_.pluck(results, "_id"), ["2"]);
+      assert.deepEqual(pluck(results, "_id"), ["2"]);
       return done();
     });
 
@@ -568,7 +569,7 @@ module.exports = function () {
 
     return it("finds sorts in Javascript order", function (done) {
       const results = this.col.find({}, { sort: ["a"] });
-      assert.deepEqual(_.pluck(results, "_id"), ["2", "1"]);
+      assert.deepEqual(pluck(results, "_id"), ["2", "1"]);
       return done();
     });
   });
@@ -705,7 +706,7 @@ module.exports = function () {
       };
 
       const results = this.col.find(selector);
-      assert.deepEqual(_.pluck(results, "_id"), ["1", "3", "2", "4"]);
+      assert.deepEqual(pluck(results, "_id"), ["1", "3", "2", "4"]);
       return done();
     });
 
@@ -720,7 +721,7 @@ module.exports = function () {
       };
 
       const results = this.col.find(selector);
-      assert.deepEqual(_.pluck(results, "_id"), ["1", "3"]);
+      assert.deepEqual(pluck(results, "_id"), ["1", "3"]);
       return done();
     });
 
@@ -735,7 +736,7 @@ module.exports = function () {
       };
 
       const results = this.col.find(selector);
-      assert.deepEqual(_.pluck(results, "_id"), ["1", "3", "2"]);
+      assert.deepEqual(pluck(results, "_id"), ["1", "3", "2"]);
       return done();
     });
 
@@ -759,7 +760,7 @@ module.exports = function () {
         },
       };
       const results = this.col.find(selector);
-      assert.deepEqual(_.pluck(results, "_id"), ["2"]);
+      assert.deepEqual(pluck(results, "_id"), ["2"]);
       return done();
     });
 
@@ -783,7 +784,7 @@ module.exports = function () {
         },
       };
       const results = this.col.find(selector, { sort: ["_id"] });
-      assert.deepEqual(_.pluck(results, "_id"), ["1", "2", "3", "4"]);
+      assert.deepEqual(pluck(results, "_id"), ["1", "2", "3", "4"]);
       return done();
     });
 
@@ -808,7 +809,7 @@ module.exports = function () {
       };
       this.col.upsert({ _id: 5 });
       const results = this.col.find(selector);
-      assert.deepEqual(_.pluck(results, "_id"), ["2"]);
+      assert.deepEqual(pluck(results, "_id"), ["2"]);
       return done();
     });
   });
