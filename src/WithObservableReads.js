@@ -4,7 +4,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 const ReadTransaction = require("./ReadTransaction");
-const { arraysAreEqual } = require('./tools');
+const { arraysAreEqual } = require("./tools");
 class ObservableRead {
   constructor(db, func, context) {
     this.db = db;

@@ -1,7 +1,7 @@
 const hasOwn = (obj, prop) => Object.prototype.hasOwnProperty.call(obj, prop);
 
 const pluck = (list, fieldName) => {
-  return list.map(entry => {
+  return list.map((entry) => {
     if (hasOwn(entry, fieldName)) {
       return entry[fieldName];
     }
@@ -18,7 +18,7 @@ const first = (array, n = 0) => {
 const last = (array) => {
   const length = array.length;
   if (length === 0) {
-    return []
+    return [];
   }
   return array[length - 1];
 };
@@ -26,11 +26,15 @@ const last = (array) => {
 const initial = (array, n = -1) => array.slice(0, n);
 
 const arraysAreEqual = (a, b) => {
-  if (a === b) { return true }
-  if (a.length !== b.length ) { return false }
-  const sortedA = [...a].sort()
-  const sortedB = [...b].sort()
-  return JSON.stringify(sortedA) === JSON.stringify(sortedB)
+  if (a === b) {
+    return true;
+  }
+  if (a.length !== b.length) {
+    return false;
+  }
+  const sortedA = [...a].sort();
+  const sortedB = [...b].sort();
+  return JSON.stringify(sortedA) === JSON.stringify(sortedB);
 };
 
 /**
@@ -42,12 +46,10 @@ const arraysAreEqual = (a, b) => {
 const rest = (list, n) => list.slice(n, list.length);
 
 const sortBy = (key) => {
-  return (a, b) => (a[key] > b[key]) ? 1 : ((b[key] > a[key]) ? -1 : 0);
+  return (a, b) => (a[key] > b[key] ? 1 : b[key] > a[key] ? -1 : 0);
 };
 
-const mixin = (destination, source) => {
-
-};
+const mixin = (destination, source) => {};
 
 module.exports = {
   hasOwn,
@@ -57,5 +59,5 @@ module.exports = {
   rest,
   initial,
   arraysAreEqual,
-  sortBy
+  sortBy,
 };

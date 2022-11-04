@@ -6,7 +6,15 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 // Utilities for db handling
-const { pluck, rest, first, last, initial, arraysAreEqual, sortBy } = require('./tools')
+const {
+  pluck,
+  rest,
+  first,
+  last,
+  initial,
+  arraysAreEqual,
+  sortBy,
+} = require("./tools");
 const { compileDocumentSelector } = require("./selector");
 const { compileSort } = require("./selector");
 
@@ -68,7 +76,7 @@ exports.filterFields = function filterFields(items, fields) {
   // TODO throw if fields contain both inclusive and exclusive criteria
 
   // For each item
-  return items.map((item)  => {
+  return items.map((item) => {
     let field, from, obj, path, pathElem;
     const newItem = {};
 
@@ -183,7 +191,9 @@ var processNearOperator = function (selector, list) {
 
       // Filter by maxDistance
       if (value["$near"]["$maxDistance"]) {
-        distances = distances.filter((item) => item.distance <= value["$near"]["$maxDistance"]);
+        distances = distances.filter(
+          (item) => item.distance <= value["$near"]["$maxDistance"]
+        );
       }
 
       // Limit to 100
@@ -212,7 +222,7 @@ const pointInPolygon = function (point, polygon) {
     throw new Error("First must equal last");
   }
 
-  const coordinates = (polygon.coordinates[0] || []);
+  const coordinates = polygon.coordinates[0] || [];
   const firstCoordinates = coordinates.map((coord) => coord[0]);
   const firstPoint = point.coordinates[0];
   const secondPoint = point.coordinates[1];
@@ -318,7 +328,7 @@ exports.regularizeUpsert = function regularizeUpsert(
   error
 ) {
   // Handle case of bases not present
-  if (typeof bases === 'function') {
+  if (typeof bases === "function") {
     [bases, success, error] = Array.from([undefined, bases, success]);
   }
 

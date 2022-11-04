@@ -14,7 +14,7 @@ const WithReactMixin = require("./WithReactMixin");
 const WithServerQuery = require("./WithServerQuery");
 const utils = require("./utils");
 const { processFind } = require("./utils");
-const { hasOwn } = require('./tools')
+const { hasOwn } = require("./tools");
 
 // TODO: use ImmutableJS (requires changing selector.js which will
 // be painful). This will also let us do MVCC.
