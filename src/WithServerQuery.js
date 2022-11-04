@@ -1,7 +1,5 @@
-'use strict';
-
-var SynchronousWriteTransaction = require('./SynchronousWriteTransaction');
-var invariant = require('invariant');
+const SynchronousWriteTransaction = require('./SynchronousWriteTransaction');
+const invariant = require('invariant');
 
 class ServerQuery {
   constructor(cache, key) {
@@ -100,7 +98,7 @@ const WithServerQuery = {
     function getInstance(props) {
       let key = spec.statics.getKey(props);
       invariant(typeof key === 'string', 'You must return a string key');
-      key = typeId + '~' + key;
+      key = `${typeId}~${key}`;
       if (!serverQueries.hasOwnProperty(key)) {
         serverQueries[key] = createNewServerQuery(cache, key, spec);
       }
@@ -112,8 +110,8 @@ const WithServerQuery = {
     }
 
     function invalidate(props) {
-      var key = spec.statics.getKey(props);
-      key = typeId + '~' + key;
+      let key = spec.statics.getKey(props);
+      key = `${typeId}~${key}`;
       serverQueries = Object.keys(serverQueries).reduce((acc, k) => {
         const obj = acc;
         if (k !== key) {

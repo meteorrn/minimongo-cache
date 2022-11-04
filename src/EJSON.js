@@ -22,8 +22,7 @@ const customTypes = new Map();
  * @param factory
  */
 EJSON.addType = function addType(name, factory) {
-  if (customTypes.has(name))
-    throw new Error('Type ' + name + ' already present');
+  if (customTypes.has(name)) throw new Error(`Type ${name} already present`);
   customTypes.set(name, factory);
 };
 

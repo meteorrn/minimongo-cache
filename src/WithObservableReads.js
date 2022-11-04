@@ -59,7 +59,9 @@ class ObservableRead {
       return;
     }
 
-    for (let collectionName in changeRecords) {
+    const names = Object.getOwnPropertyNames(changeRecords);
+
+    for (const collectionName of names) {
       // Did we scan the collection?
       if (this.lastReadTransaction.dirtyScans[collectionName]) {
         this.rerunTransaction();

@@ -4,6 +4,7 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
+const { each } = require('./tools');
 const NullTransaction = require('./NullTransaction');
 
 class WriteTransaction extends NullTransaction {
@@ -53,15 +54,15 @@ class WriteTransaction extends NullTransaction {
     const ReadOnlyTransaction = require('./ReadOnlyTransaction');
 
     const changeRecords = {};
-    for (let collectionName in this.dirtyIds) {
+    each(this.dirtyIds, (collectionName) => {
       const ids = this.dirtyIds[collectionName];
       const documentFragments = [];
-      for (let id in ids) {
+      each(ids, (id) => {
         const version = this.db.collections[collectionName].versions[id];
         documentFragments.push({ _id: id, _version: version });
-      }
+      });
       changeRecords[collectionName] = documentFragments;
-    }
+    });
     this.dirtyIds = {};
     this.queued = false;
 
@@ -74,9 +75,9 @@ class WriteTransaction extends NullTransaction {
           const prev_prepare = Error.prepareStackTrace;
           Error.prepareStackTrace = (e) => {
             let { stack } = e;
-            for (let trace in traces) {
-              stack += '\nFrom observed write:\n' + trace;
-            }
+            each(traces, (trace) => {
+              stack += `\nFrom observed write:\n${trace}`;
+            });
             return stack;
           };
 

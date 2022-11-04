@@ -49,7 +49,7 @@ const sortBy = (key) => {
   return (a, b) => (a[key] > b[key] ? 1 : b[key] > a[key] ? -1 : 0);
 };
 
-const mixin = (destination, source) => {};
+const each = (obj, fn) => Object.getOwnPropertyNames(obj || {}).forEach(fn);
 
 module.exports = {
   hasOwn,
@@ -60,4 +60,5 @@ module.exports = {
   initial,
   arraysAreEqual,
   sortBy,
+  each,
 };

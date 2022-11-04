@@ -42,7 +42,7 @@ const hasOperators = (valueSelector) => {
     if (theseAreOperators === undefined) {
       theseAreOperators = thisIsOperator;
     } else if (theseAreOperators !== thisIsOperator) {
-      throw new Error('Inconsistent selector: ' + valueSelector);
+      throw new Error(`Inconsistent selector: ${valueSelector}`);
     }
   });
   return !!theseAreOperators; // {} has no operators
@@ -84,7 +84,7 @@ const compileValueSelector = (valueSelector) => {
 
     Object.entries(valueSelector).forEach(([operator, operand]) => {
       if (!hasProp(VALUE_OPERATORS, operator)) {
-        throw new Error('Unrecognized operator: ' + operator);
+        throw new Error(`Unrecognized operator: ${operator}`);
       }
 
       const opFn = VALUE_OPERATORS[operator];
@@ -517,7 +517,7 @@ const compileDocumentSelector = function compileDocumentSelector(docSelector) {
       // Outer operators are either logical operators (they recurse back into
       // this function), or $where.
       if (!hasProp(LOGICAL_OPERATORS, key)) {
-        throw new Error('Unrecognized logical operator: ' + key);
+        throw new Error(`Unrecognized logical operator: ${key}`);
       }
       perKeySelectors.push(LOGICAL_OPERATORS[key](subSelector));
     } else {

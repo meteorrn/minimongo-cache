@@ -14,7 +14,7 @@ const WithReactMixin = require('./WithReactMixin');
 const WithServerQuery = require('./WithServerQuery');
 const utils = require('./utils');
 const { processFind } = require('./utils');
-const { hasOwn } = require('./tools');
+const { hasOwn, each } = require('./tools');
 
 // TODO: use ImmutableJS (requires changing selector.js which will
 // be painful). This will also let us do MVCC.
@@ -37,19 +37,19 @@ module.exports = MemoryDb = class MemoryDb {
 
   serialize() {
     const data = {};
-    for (let collectionName in this.collections) {
+    each(this.collections, (collectionName) => {
       data[collectionName] = this.collections[collectionName].serialize();
-    }
+    });
     return data;
   }
 
   static deserialize(data) {
     const db = new MemoryDb();
-    for (let collectionName in data) {
+    each(data, (collectionName) => {
       const collection = Collection.deserialize(db, data[collectionName]);
       db.collections[collectionName] = collection;
       db[collectionName] = collection;
-    }
+    });
     return db;
   }
 
@@ -154,7 +154,7 @@ class Collection {
   upsert(docs) {
     const [items, _1, _2] = Array.from(utils.regularizeUpsert(docs));
 
-    for (let item of Array.from(items)) {
+    Array.from(items).forEach((item) => {
       // Shallow copy since MemoryDb adds _version to the document.
       // TODO: should we get rid of this mutation?
       const doc = Object.assign({}, this.items[item.doc._id] || {}, item.doc);
@@ -164,7 +164,7 @@ class Collection {
       this.version += 1;
       this.versions[doc._id] = (this.versions[doc._id] || 0) + 1;
       this.items[doc._id]._version = this.versions[doc._id];
-    }
+    });
 
     return this.db.transaction.upsert(this.name, docs, docs);
   }
