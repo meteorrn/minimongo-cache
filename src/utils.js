@@ -62,7 +62,7 @@ exports.filterFields = function filterFields(items, fields) {
   if (fields == null) {
     fields = {};
   }
-  if (_.keys(fields).length === 0) {
+  if (Object.keys(fields).length === 0) {
     return items;
   }
 
@@ -74,10 +74,10 @@ exports.filterFields = function filterFields(items, fields) {
     const newItem = {};
 
     // TODO move this check out of map to increase performance
-    // TODO: const inclusive = first(_.values(fields)) === 1
+
     if (first(Object.values(fields)) === 1) {
       // Include fields
-      for (field of Array.from(_.keys(fields).concat(["_id"]))) {
+      for (field of Array.from(Object.keys(fields).concat(["_id"]))) {
         path = field.split(".");
 
         // Determine if path exists
@@ -110,7 +110,7 @@ exports.filterFields = function filterFields(items, fields) {
       return newItem;
     } else {
       // Exclude fields
-      for (field of Array.from(_.keys(fields).concat(["_id"]))) {
+      for (field of Array.from(Object.keys(fields).concat(["_id"]))) {
         path = field.split(".");
 
         // Go inside path
