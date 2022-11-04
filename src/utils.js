@@ -331,7 +331,7 @@ exports.regularizeUpsert = function regularizeUpsert(
   error
 ) {
   // Handle case of bases not present
-  if (_.isFunction(bases)) {
+  if (typeof bases === 'function') {
     [bases, success, error] = Array.from([undefined, bases, success]);
   }
 
