@@ -6,7 +6,6 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 // Utilities for db handling
-const _ = require("lodash");
 const { pluck, rest, first, last, initial, arraysAreEqual, sortBy } = require('./tools')
 const { compileDocumentSelector } = require("./selector");
 const { compileSort } = require("./selector");

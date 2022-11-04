@@ -12,8 +12,6 @@ const WithObservableReads = require("./WithObservableReads");
 const WithObservableWrites = require("./WithObservableWrites");
 const WithReactMixin = require("./WithReactMixin");
 const WithServerQuery = require("./WithServerQuery");
-
-const _ = require("lodash");
 const utils = require("./utils");
 const { processFind } = require("./utils");
 const { hasOwn } = require('./tools')
@@ -79,10 +77,10 @@ module.exports = MemoryDb = class MemoryDb {
   }
 };
 
-_.mixin(MemoryDb.prototype, WithObservableReads);
-_.mixin(MemoryDb.prototype, WithObservableWrites);
-_.mixin(MemoryDb.prototype, WithReactMixin);
-_.mixin(MemoryDb.prototype, WithServerQuery);
+Object.assign(MemoryDb.prototype, WithObservableReads);
+Object.assign(MemoryDb.prototype, WithObservableWrites);
+Object.assign(MemoryDb.prototype, WithReactMixin);
+Object.assign(MemoryDb.prototype, WithServerQuery);
 
 // Stores data in memory
 class Collection {

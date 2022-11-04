@@ -5,7 +5,6 @@
  */
 const ReadTransaction = require("./ReadTransaction");
 const { arraysAreEqual } = require('./tools');
-const _ = require('lodash');
 class ObservableRead {
   constructor(db, func, context) {
     this.db = db;

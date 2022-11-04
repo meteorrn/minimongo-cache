@@ -1,8 +1,6 @@
 "use strict";
 
 var SynchronousWriteTransaction = require("./SynchronousWriteTransaction");
-
-var _ = require("lodash");
 var invariant = require("invariant");
 
 class ServerQuery {
@@ -77,7 +75,7 @@ function createNewServerQuery(cache, key, spec) {
   }
 
   let serverQuery = new ServerQuery(cache, key);
-  _.mixin(serverQuery, spec);
+  Object.assign(serverQuery, spec);
 
   return serverQuery;
 }

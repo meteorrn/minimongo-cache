@@ -1,14 +1,10 @@
-"use strict";
-
-const _ = require("lodash");
-
-function cannotRead() {
+const cannotRead = () => {
   throw new Error("Cannot read in a SynchronousWriteTransaction");
 }
 
 function SynchronousWriteTransaction() {}
 
-_.mixin(SynchronousWriteTransaction.prototype, {
+Object.assign(SynchronousWriteTransaction.prototype, {
   get: cannotRead,
   find: cannotRead,
   findOne: cannotRead,

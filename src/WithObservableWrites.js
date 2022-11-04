@@ -1,7 +1,5 @@
 const EventEmitter = require("eventemitter3");
 const WriteTransaction = require("./WriteTransaction");
-const _ = require("lodash");
-
 const WithObservableWrites = {
   getDefaultTransaction() {
     this.setMaxListeners(0);
@@ -9,6 +7,6 @@ const WithObservableWrites = {
   },
 };
 
-_.mixin(WithObservableWrites, EventEmitter.prototype);
+Object.assign(WithObservableWrites, EventEmitter.prototype);
 
 module.exports = WithObservableWrites;
