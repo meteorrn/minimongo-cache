@@ -7,7 +7,7 @@
  */
 // Utilities for db handling
 const _ = require("lodash");
-const { pluck, rest, first, last } = require('../lib/utils')
+const { pluck, rest, first, last, initial } = require('../lib/utils')
 const { compileDocumentSelector } = require("./selector");
 const { compileSort } = require("./selector");
 
@@ -95,7 +95,7 @@ exports.filterFields = function filterFields(items, fields) {
         // Go into path, creating as necessary
         from = item;
         let to = newItem;
-        for (pathElem of Array.from(_.initial(path))) {
+        for (pathElem of Array.from(initial(path))) {
           to[pathElem] = to[pathElem] || {};
 
           // Move inside
@@ -115,7 +115,7 @@ exports.filterFields = function filterFields(items, fields) {
 
         // Go inside path
         obj = item;
-        for (pathElem of Array.from(_.initial(path))) {
+        for (pathElem of Array.from(initial(path))) {
           if (obj) {
             obj = obj[pathElem];
           }
