@@ -4,7 +4,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const invariant = require("invariant");
+const invariant = require('invariant');
 
 const createMixin = function (db) {
   let Mixin;
@@ -12,7 +12,7 @@ const createMixin = function (db) {
     componentWillMount() {
       invariant(
         this.observeData != null,
-        "You must implement observeData: " + this.constructor.displayName
+        'You must implement observeData: ' + this.constructor.displayName
       );
       this.subscription = null;
       this.prevData = null;

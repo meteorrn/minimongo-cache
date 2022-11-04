@@ -2,8 +2,8 @@
 // https://github.com/facebook/react-native/blob/main/Libraries/Utilities/binaryToBase64.js
 // so there are no extra deps when using rn
 // also, base64-js is fully js and browser-compatible
-const base64 = require("base64-js");
-const { hasProp, objSize, isArguments } = require("./helpers");
+const base64 = require('base64-js');
+const { hasProp, objSize, isArguments } = require('./helpers');
 const EJSON = {}; // Global!
 const customTypes = new Map();
 
@@ -23,7 +23,7 @@ const customTypes = new Map();
  */
 EJSON.addType = function addType(name, factory) {
   if (customTypes.has(name))
-    throw new Error("Type " + name + " already present");
+    throw new Error('Type ' + name + ' already present');
   customTypes.set(name, factory);
 };
 
@@ -31,7 +31,7 @@ const builtinConverters = [
   {
     // Date
     matchJSONValue: function (obj) {
-      return hasProp(obj, "$date") && objSize(obj) === 1;
+      return hasProp(obj, '$date') && objSize(obj) === 1;
     },
     matchObject: function (obj) {
       return obj instanceof Date;
@@ -46,12 +46,12 @@ const builtinConverters = [
   {
     // Binary
     matchJSONValue: function (obj) {
-      return hasProp(obj, "$binary") && objSize(obj) === 1;
+      return hasProp(obj, '$binary') && objSize(obj) === 1;
     },
     matchObject: function (obj) {
       return (
-        (typeof Uint8Array !== "undefined" && obj instanceof Uint8Array) ||
-        (obj && hasProp(obj, "$Uint8ArrayPolyfill"))
+        (typeof Uint8Array !== 'undefined' && obj instanceof Uint8Array) ||
+        (obj && hasProp(obj, '$Uint8ArrayPolyfill'))
       );
     },
     toJSONValue: function (obj) {
@@ -64,7 +64,7 @@ const builtinConverters = [
   {
     // Escaping one level
     matchJSONValue: function (obj) {
-      return hasProp(obj, "$escape") && objSize(obj) === 1;
+      return hasProp(obj, '$escape') && objSize(obj) === 1;
     },
     matchObject: function (obj) {
       if (obj === null || obj === undefined) {
@@ -97,7 +97,7 @@ const builtinConverters = [
     // Custom
     matchJSONValue: function (obj) {
       return (
-        hasProp(obj, "$type") && hasProp(obj, "$value") && objSize(obj) === 2
+        hasProp(obj, '$type') && hasProp(obj, '$value') && objSize(obj) === 2
       );
     },
     matchObject: function (obj) {
@@ -131,8 +131,8 @@ const _base64Encode = (obj) => {
 EJSON._isCustomType = function _isCustomType(obj) {
   return !!(
     obj &&
-    typeof obj.toJSONValue === "function" &&
-    typeof obj.typeName === "function" &&
+    typeof obj.toJSONValue === 'function' &&
+    typeof obj.typeName === 'function' &&
     customTypes.has(obj.typeName())
   );
 };
@@ -143,7 +143,7 @@ const adjustTypesToJSONValue = (EJSON._adjustTypesToJSONValue = function (obj) {
   const maybeChanged = toJSONValueHelper(obj);
   if (maybeChanged !== undefined) return maybeChanged;
   Object.entries(obj).forEach(([key, value]) => {
-    if (typeof value !== "object" && value !== undefined) return; // continue
+    if (typeof value !== 'object' && value !== undefined) return; // continue
     const changed = toJSONValueHelper(value);
     if (changed) {
       obj[key] = changed;
@@ -175,7 +175,7 @@ const toJSONValueHelper = function (item) {
 EJSON.toJSONValue = function toJSONValue(item) {
   const changed = toJSONValueHelper(item);
   if (changed !== undefined) return changed;
-  if (typeof item === "object") {
+  if (typeof item === 'object') {
     item = EJSON.clone(item);
     adjustTypesToJSONValue(item);
   }
@@ -192,7 +192,7 @@ const adjustTypesFromJSONValue = (EJSON._adjustTypesFromJSONValue = function (
   const maybeChanged = fromJSONValueHelper(obj);
   if (maybeChanged !== obj) return maybeChanged;
   Object.entries(obj).forEach(([key, value]) => {
-    if (typeof value === "object") {
+    if (typeof value === 'object') {
       const changed = fromJSONValueHelper(value);
       if (value !== changed) {
         obj[key] = changed;
@@ -212,12 +212,12 @@ const adjustTypesFromJSONValue = (EJSON._adjustTypesFromJSONValue = function (
 // DOES NOT RECURSE.  For actually getting the fully-changed value, use
 // EJSON.fromJSONValue
 const fromJSONValueHelper = function (value) {
-  if (typeof value === "object" && value !== null) {
+  if (typeof value === 'object' && value !== null) {
     const keys = Object.keys(value);
 
     if (
       keys.length <= 2 &&
-      keys.every((k) => typeof k === "string" && k.substr(0, 1) === "$")
+      keys.every((k) => typeof k === 'string' && k.substr(0, 1) === '$')
     ) {
       for (const converter of builtinConverters) {
         if (converter.matchJSONValue(value)) {
@@ -237,7 +237,7 @@ const fromJSONValueHelper = function (value) {
  */
 EJSON.fromJSONValue = function fromJSONValue(item) {
   const changed = fromJSONValueHelper(item);
-  if (changed === item && typeof item === "object") {
+  if (changed === item && typeof item === 'object') {
     item = EJSON.clone(item);
     adjustTypesFromJSONValue(item);
     return item;
@@ -273,7 +273,7 @@ EJSON.parse = function parse(item) {
  */
 EJSON.isBinary = function isBinary(obj) {
   return (
-    (typeof Uint8Array !== "undefined" && obj instanceof Uint8Array) ||
+    (typeof Uint8Array !== 'undefined' && obj instanceof Uint8Array) ||
     (obj && obj.$Uint8ArrayPolyfill)
   );
 };
@@ -295,7 +295,7 @@ EJSON.equals = function quals(a, b, options) {
   if (!a || !b)
     // if either one is falsy, they'd have to be === to be equal
     return false;
-  if (!(typeof a === "object" && typeof b === "object")) return false;
+  if (!(typeof a === 'object' && typeof b === 'object')) return false;
   if (a instanceof Date && b instanceof Date)
     return a.valueOf() === b.valueOf();
   if (EJSON.isBinary(a) && EJSON.isBinary(b)) {
@@ -305,7 +305,7 @@ EJSON.equals = function quals(a, b, options) {
     }
     return true;
   }
-  if (typeof a.equals === "function") return a.equals(b, options);
+  if (typeof a.equals === 'function') return a.equals(b, options);
 
   // Array.isArray works across iframes while instanceof won't
   const aIsArray = Array.isArray(a);
@@ -365,7 +365,7 @@ EJSON.equals = function quals(a, b, options) {
  */
 EJSON.clone = function clone(v) {
   let ret;
-  if (typeof v !== "object") return v;
+  if (typeof v !== 'object') return v;
   if (v === null) return null; // null has typeof "object"
   if (v instanceof Date) return new Date(v.getTime());
   if (EJSON.isBinary(v)) {
@@ -378,7 +378,7 @@ EJSON.clone = function clone(v) {
     return v.map((entry) => EJSON.clone(entry));
   }
   // handle general user-defined typed Objects if they have a clone method
-  if (typeof v.clone === "function") {
+  if (typeof v.clone === 'function') {
     return v.clone();
   }
   // handle other objects

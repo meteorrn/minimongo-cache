@@ -13,10 +13,10 @@ class NullTransaction {
     return result;
   }
   upsert(collectionName, result, ...args) {
-    throw new Error("Cannot write outside of a WriteTransaction");
+    throw new Error('Cannot write outside of a WriteTransaction');
   }
   del(collectionName, result, ...args) {
-    throw new Error("Cannot write outside of a WriteTransaction");
+    throw new Error('Cannot write outside of a WriteTransaction');
   }
   canPushTransaction(transaction) {
     return true;

@@ -14,9 +14,9 @@ const {
   initial,
   arraysAreEqual,
   sortBy,
-} = require("./tools");
-const { compileDocumentSelector } = require("./selector");
-const { compileSort } = require("./selector");
+} = require('./tools');
+const { compileDocumentSelector } = require('./selector');
+const { compileSort } = require('./selector');
 
 // Compile a document selector (query) to a lambda function
 exports.compileDocumentSelector = compileDocumentSelector;
@@ -84,8 +84,8 @@ exports.filterFields = function filterFields(items, fields) {
 
     if (first(Object.values(fields)) === 1) {
       // Include fields
-      for (field of Array.from(Object.keys(fields).concat(["_id"]))) {
-        path = field.split(".");
+      for (field of Array.from(Object.keys(fields).concat(['_id']))) {
+        path = field.split('.');
 
         // Determine if path exists
         obj = item;
@@ -117,8 +117,8 @@ exports.filterFields = function filterFields(items, fields) {
       return newItem;
     } else {
       // Exclude fields
-      for (field of Array.from(Object.keys(fields).concat(["_id"]))) {
-        path = field.split(".");
+      for (field of Array.from(Object.keys(fields).concat(['_id']))) {
+        path = field.split('.');
 
         // Go inside path
         obj = item;
@@ -141,7 +141,7 @@ exports.filterFields = function filterFields(items, fields) {
   });
 };
 
-const pattern = "xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx";
+const pattern = 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx';
 
 /**
  * Creates a unique identifier string of 32 characters length.
@@ -150,7 +150,7 @@ const pattern = "xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx";
 exports.createUid = () =>
   pattern.replace(/[xy]/g, function (c) {
     const r = (Math.random() * 16) | 0;
-    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 
@@ -163,13 +163,13 @@ exports.createUid = () =>
 var processNearOperator = function (selector, list) {
   for (var key in selector) {
     var value = selector[key];
-    if (value != null && value["$near"]) {
-      var geo = value["$near"]["$geometry"];
-      if (geo.type !== "Point") {
+    if (value != null && value['$near']) {
+      var geo = value['$near']['$geometry'];
+      if (geo.type !== 'Point') {
         break;
       }
 
-      list = list.filter((doc) => doc[key] && doc[key].type === "Point");
+      list = list.filter((doc) => doc[key] && doc[key].type === 'Point');
 
       // Get distances
       let distances = list.map((doc) => ({
@@ -187,12 +187,12 @@ var processNearOperator = function (selector, list) {
       distances = distances.filter((item) => item.distance >= 0);
 
       // Sort by distance
-      distances = distances.sort(sortBy("distance"));
+      distances = distances.sort(sortBy('distance'));
 
       // Filter by maxDistance
-      if (value["$near"]["$maxDistance"]) {
+      if (value['$near']['$maxDistance']) {
         distances = distances.filter(
-          (item) => item.distance <= value["$near"]["$maxDistance"]
+          (item) => item.distance <= value['$near']['$maxDistance']
         );
       }
 
@@ -200,7 +200,7 @@ var processNearOperator = function (selector, list) {
       distances = first(distances, 100);
 
       // Extract docs
-      list = pluck(distances, "doc");
+      list = pluck(distances, 'doc');
     }
   }
   return list;
@@ -219,7 +219,7 @@ const pointInPolygon = function (point, polygon) {
   const lastEntry = last(polygon.coordinates[0]);
 
   if (!arraysAreEqual(firstEntry, lastEntry)) {
-    throw new Error("First must equal last");
+    throw new Error('First must equal last');
   }
 
   const coordinates = polygon.coordinates[0] || [];
@@ -289,16 +289,16 @@ var deg2rad = (deg) => deg * (Math.PI / 180);
 var processGeoIntersectsOperator = function (selector, list) {
   for (var key in selector) {
     const value = selector[key];
-    if (value != null && value["$geoIntersects"]) {
-      var geo = value["$geoIntersects"]["$geometry"];
-      if (geo.type !== "Polygon") {
+    if (value != null && value['$geoIntersects']) {
+      var geo = value['$geoIntersects']['$geometry'];
+      if (geo.type !== 'Polygon') {
         break;
       }
 
       // Check within for each
       list = list.filter((doc) => {
         // Reject non-points
-        if (!doc[key] || doc[key].type !== "Point") {
+        if (!doc[key] || doc[key].type !== 'Point') {
           return false;
         }
 
@@ -328,7 +328,7 @@ exports.regularizeUpsert = function regularizeUpsert(
   error
 ) {
   // Handle case of bases not present
-  if (typeof bases === "function") {
+  if (typeof bases === 'function') {
     [bases, success, error] = Array.from([undefined, bases, success]);
   }
 
@@ -349,7 +349,7 @@ exports.regularizeUpsert = function regularizeUpsert(
   // check for _id
   for (let item of Array.from(items)) {
     if (item.doc._id == null) {
-      throw new Error("All documents in the upsert must have an _id");
+      throw new Error('All documents in the upsert must have an _id');
     }
   }
 

@@ -11,7 +11,7 @@ const objSize = (o) => Object.keys(o).length;
 /**
  * Checks if object is arguments object
  */
-const isArguments = (obj) => obj != null && hasProp(obj, "callee");
+const isArguments = (obj) => obj != null && hasProp(obj, 'callee');
 
 const nullish = (obj) => obj === null || obj === undefined;
 

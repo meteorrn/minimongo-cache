@@ -1,7 +1,7 @@
 recursive: true
-reporter: "spec"
+reporter: 'spec'
 retries: 1
 slow: 20
 timeout: 2000
-ui: "bdd"
+ui: 'bdd'
 # for more options see here https://github.com/mochajs/mocha/blob/master/example/config/.mocharc.yml

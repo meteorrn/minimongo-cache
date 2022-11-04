@@ -3,8 +3,8 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const ReadTransaction = require("./ReadTransaction");
-const { arraysAreEqual } = require("./tools");
+const ReadTransaction = require('./ReadTransaction');
+const { arraysAreEqual } = require('./tools');
 class ObservableRead {
   constructor(db, func, context) {
     this.db = db;
@@ -14,7 +14,7 @@ class ObservableRead {
     this.lastValue = null;
     this.subscribers = [];
     this.changeListener = this.changeListener.bind(this);
-    this.db.on("change", this.changeListener);
+    this.db.on('change', this.changeListener);
     this.rerunTransaction();
   }
 
@@ -25,7 +25,7 @@ class ObservableRead {
   }
 
   dispose() {
-    return this.db.removeListener("change", this.changeListener);
+    return this.db.removeListener('change', this.changeListener);
   }
 
   rerunTransaction() {

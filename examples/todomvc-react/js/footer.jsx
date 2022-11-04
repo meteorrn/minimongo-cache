@@ -6,11 +6,11 @@
 var app = app || {};
 
 (function () {
-  "use strict";
+  'use strict';
 
   app.TodoFooter = React.createClass({
     render: function () {
-      var activeTodoWord = app.Utils.pluralize(this.props.count, "item");
+      var activeTodoWord = app.Utils.pluralize(this.props.count, 'item');
       var clearButton = null;
 
       if (this.props.completedCount > 0) {
@@ -40,7 +40,7 @@ var app = app || {};
               >
                 All
               </a>
-            </li>{" "}
+            </li>{' '}
             <li>
               <a
                 href="#/active"
@@ -50,7 +50,7 @@ var app = app || {};
               >
                 Active
               </a>
-            </li>{" "}
+            </li>{' '}
             <li>
               <a
                 href="#/completed"

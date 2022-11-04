@@ -21,8 +21,8 @@ licenses, included below:
 */
 
 const LocalCollection = {};
-const EJSON = require("./EJSON");
-const { hasProp, emptyArray } = require("./helpers");
+const EJSON = require('./EJSON');
+const { hasProp, emptyArray } = require('./helpers');
 
 // Like Array.isArray, but doesn't regard polyfilled Uint8Arrays on old browsers as
 // arrays.
@@ -37,12 +37,12 @@ const hasOperators = (valueSelector) => {
   let theseAreOperators = undefined;
 
   Object.keys(valueSelector).forEach((selKey) => {
-    const thisIsOperator = selKey.substr(0, 1) === "$";
+    const thisIsOperator = selKey.substr(0, 1) === '$';
 
     if (theseAreOperators === undefined) {
       theseAreOperators = thisIsOperator;
     } else if (theseAreOperators !== thisIsOperator) {
-      throw new Error("Inconsistent selector: " + valueSelector);
+      throw new Error('Inconsistent selector: ' + valueSelector);
     }
   });
   return !!theseAreOperators; // {} has no operators
@@ -74,7 +74,7 @@ const compileValueSelector = (valueSelector) => {
   }
 
   // Selector is a non-null primitive (and not an array or RegExp either).
-  if (typeof valueSelector !== "object") {
+  if (typeof valueSelector !== 'object') {
     return (value) => _anyIfArray(value, (x) => x === valueSelector);
   }
 
@@ -84,7 +84,7 @@ const compileValueSelector = (valueSelector) => {
 
     Object.entries(valueSelector).forEach(([operator, operand]) => {
       if (!hasProp(VALUE_OPERATORS, operator)) {
-        throw new Error("Unrecognized operator: " + operator);
+        throw new Error('Unrecognized operator: ' + operator);
       }
 
       const opFn = VALUE_OPERATORS[operator];
@@ -104,7 +104,7 @@ const compileValueSelector = (valueSelector) => {
 const LOGICAL_OPERATORS = {
   $and(subSelector) {
     if (!isArray(subSelector) || emptyArray(subSelector)) {
-      throw Error("$and/$or/$nor must be nonempty array");
+      throw Error('$and/$or/$nor must be nonempty array');
     }
 
     const subSelectorFunctions = subSelector.map(compileDocumentSelector);
@@ -113,7 +113,7 @@ const LOGICAL_OPERATORS = {
 
   $or(subSelector) {
     if (!isArray(subSelector) || emptyArray(subSelector)) {
-      throw Error("$and/$or/$nor must be nonempty array");
+      throw Error('$and/$or/$nor must be nonempty array');
     }
 
     const subSelectorFunctions = subSelector.map(compileDocumentSelector);
@@ -122,7 +122,7 @@ const LOGICAL_OPERATORS = {
 
   $nor(subSelector) {
     if (!isArray(subSelector) || emptyArray(subSelector)) {
-      throw Error("$and/$or/$nor must be nonempty array");
+      throw Error('$and/$or/$nor must be nonempty array');
     }
 
     const subSelectorFunctions = subSelector.map(compileDocumentSelector);
@@ -142,7 +142,7 @@ const LOGICAL_OPERATORS = {
 const VALUE_OPERATORS = {
   $in(operand) {
     if (!isArray(operand)) {
-      throw new Error("Argument to $in must be array");
+      throw new Error('Argument to $in must be array');
     }
 
     const opFn = (x) => operand.some((el) => LocalCollection._f._equal(el, x));
@@ -151,7 +151,7 @@ const VALUE_OPERATORS = {
 
   $all(operand) {
     if (!isArray(operand)) {
-      throw new Error("Argument to $all must be array");
+      throw new Error('Argument to $all must be array');
     }
 
     return (value) =>
@@ -189,7 +189,7 @@ const VALUE_OPERATORS = {
 
   $nin(operand) {
     if (!isArray(operand)) {
-      throw new Error("Argument to $nin must be array");
+      throw new Error('Argument to $nin must be array');
     }
 
     const inFunction = VALUE_OPERATORS.$in(operand);
@@ -233,7 +233,7 @@ const VALUE_OPERATORS = {
       // ones (eg, Mongo supports x and s). Ideally we would implement x and s
       // by transforming the regexp, but not today...
       if (/[^gim]/.test(options)) {
-        throw new Error("Only the i, m, and g regexp options are supported");
+        throw new Error('Only the i, m, and g regexp options are supported');
       }
 
       const regexSource = operand instanceof RegExp ? operand.source : operand;
@@ -288,13 +288,13 @@ LocalCollection._f = {
   // XXX for _all and _in, consider building 'inquery' at compile time..
 
   _type(v) {
-    if (typeof v === "number") return 1;
-    if (typeof v === "string") return 2;
-    if (typeof v === "boolean") return 8;
+    if (typeof v === 'number') return 1;
+    if (typeof v === 'string') return 2;
+    if (typeof v === 'boolean') return 8;
     if (isArray(v)) return 4;
     if (v === null) return 10;
     if (v instanceof RegExp) return 11;
-    if (typeof v === "function") {
+    if (typeof v === 'function') {
       // note that typeof(/x/) === "function"
       return 13;
     }
@@ -361,7 +361,7 @@ LocalCollection._f = {
     if (ta !== tb) {
       // XXX need to implement this if we implement Symbol or integers, or
       // Timestamp
-      throw Error("Missing type coercion logic in _cmp");
+      throw Error('Missing type coercion logic in _cmp');
     }
     if (ta === 7) {
       // ObjectID
@@ -424,7 +424,7 @@ LocalCollection._f = {
     }
     if (ta === 11) {
       // regexp
-      throw Error("Sorting not supported on regular expression"); // XXX
+      throw Error('Sorting not supported on regular expression'); // XXX
     }
     // 13: javascript code
     // 14: symbol
@@ -436,9 +436,9 @@ LocalCollection._f = {
     // 127: maxkey
     if (ta === 13) {
       // javascript code
-      throw Error("Sorting not supported on Javascript code"); // XXX
+      throw Error('Sorting not supported on Javascript code'); // XXX
     }
-    throw Error("Unknown type to sort");
+    throw Error('Unknown type to sort');
   },
 };
 
@@ -460,7 +460,7 @@ LocalCollection._f = {
 //                                 {y: 3}]})
 //   returns [1, [2], undefined]
 LocalCollection._makeLookupFunction = function (key) {
-  const dotLocation = key.indexOf(".");
+  const dotLocation = key.indexOf('.');
   let first, lookupRest, nextIsNumeric;
 
   if (dotLocation === -1) {
@@ -513,11 +513,11 @@ LocalCollection._makeLookupFunction = function (key) {
 const compileDocumentSelector = function compileDocumentSelector(docSelector) {
   const perKeySelectors = [];
   Object.entries(docSelector || {}).forEach(([key, subSelector]) => {
-    if (key.substr(0, 1) === "$") {
+    if (key.substr(0, 1) === '$') {
       // Outer operators are either logical operators (they recurse back into
       // this function), or $where.
       if (!hasProp(LOGICAL_OPERATORS, key)) {
-        throw new Error("Unrecognized logical operator: " + key);
+        throw new Error('Unrecognized logical operator: ' + key);
       }
       perKeySelectors.push(LOGICAL_OPERATORS[key](subSelector));
     } else {
@@ -559,7 +559,7 @@ LocalCollection._compileSort = function compileSort(spec) {
 
   if (spec instanceof Array) {
     for (let i = 0; i < spec.length; i++) {
-      if (typeof spec[i] === "string") {
+      if (typeof spec[i] === 'string') {
         sortSpecParts.push({
           lookup: LocalCollection._makeLookupFunction(spec[i]),
           ascending: true,
@@ -567,11 +567,11 @@ LocalCollection._compileSort = function compileSort(spec) {
       } else {
         sortSpecParts.push({
           lookup: LocalCollection._makeLookupFunction(spec[i][0]),
-          ascending: spec[i][1] !== "desc",
+          ascending: spec[i][1] !== 'desc',
         });
       }
     }
-  } else if (typeof spec === "object" && spec !== null) {
+  } else if (typeof spec === 'object' && spec !== null) {
     Object.keys(spec).forEach((key) => {
       sortSpecParts.push({
         lookup: LocalCollection._makeLookupFunction(key),
@@ -579,7 +579,7 @@ LocalCollection._compileSort = function compileSort(spec) {
       });
     });
   } else {
-    throw Error("Bad sort specification: ", JSON.stringify(spec));
+    throw Error('Bad sort specification: ', JSON.stringify(spec));
   }
 
   if (sortSpecParts.length === 0)

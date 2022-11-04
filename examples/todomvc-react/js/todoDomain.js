@@ -6,12 +6,12 @@
 var app = app || {};
 
 (function () {
-  "use strict";
+  'use strict';
 
-  var minimongo = require("minimongo");
+  var minimongo = require('minimongo');
   var Utils = app.Utils;
   app.TodoDb = new minimongo();
-  app.TodoDb.addCollection("todos");
+  app.TodoDb.addCollection('todos');
 
   app.TodoDomain = {
     getAllTodos: function () {

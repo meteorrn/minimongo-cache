@@ -7,14 +7,14 @@
  */
 let MemoryDb;
 
-const NullTransaction = require("./NullTransaction");
-const WithObservableReads = require("./WithObservableReads");
-const WithObservableWrites = require("./WithObservableWrites");
-const WithReactMixin = require("./WithReactMixin");
-const WithServerQuery = require("./WithServerQuery");
-const utils = require("./utils");
-const { processFind } = require("./utils");
-const { hasOwn } = require("./tools");
+const NullTransaction = require('./NullTransaction');
+const WithObservableReads = require('./WithObservableReads');
+const WithObservableWrites = require('./WithObservableWrites');
+const WithReactMixin = require('./WithReactMixin');
+const WithServerQuery = require('./WithServerQuery');
+const utils = require('./utils');
+const { processFind } = require('./utils');
+const { hasOwn } = require('./tools');
 
 // TODO: use ImmutableJS (requires changing selector.js which will
 // be painful). This will also let us do MVCC.
@@ -64,7 +64,7 @@ module.exports = MemoryDb = class MemoryDb {
 
   withTransaction(transaction, func, context) {
     if (!this.transaction.canPushTransaction(transaction)) {
-      throw new Error("Already in a transaction");
+      throw new Error('Already in a transaction');
     }
 
     const prevTransaction = this.transaction;

@@ -1,5 +1,5 @@
 const cannotRead = () => {
-  throw new Error("Cannot read in a SynchronousWriteTransaction");
+  throw new Error('Cannot read in a SynchronousWriteTransaction');
 };
 
 function SynchronousWriteTransaction() {}

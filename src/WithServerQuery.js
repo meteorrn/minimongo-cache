@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
-var SynchronousWriteTransaction = require("./SynchronousWriteTransaction");
-var invariant = require("invariant");
+var SynchronousWriteTransaction = require('./SynchronousWriteTransaction');
+var invariant = require('invariant');
 
 class ServerQuery {
   constructor(cache, key) {
@@ -21,7 +21,7 @@ class ServerQuery {
   queryDidUpdate(prevProps) {}
 
   query() {
-    throw new Error("ServerQuery.query() not implemented");
+    throw new Error('ServerQuery.query() not implemented');
   }
 
   setState(updates) {
@@ -68,10 +68,10 @@ class ServerQuery {
 }
 
 function createNewServerQuery(cache, key, spec) {
-  invariant(spec.hasOwnProperty("query"), "You must implement query()");
+  invariant(spec.hasOwnProperty('query'), 'You must implement query()');
 
-  if (!cache.hasOwnProperty("serverQueries")) {
-    cache.addCollection("serverQueries");
+  if (!cache.hasOwnProperty('serverQueries')) {
+    cache.addCollection('serverQueries');
   }
 
   let serverQuery = new ServerQuery(cache, key);
@@ -87,20 +87,20 @@ const WithServerQuery = {
   createServerQuery(spec) {
     const cache = this;
     invariant(
-      spec.hasOwnProperty("statics"),
-      "spec must have statics property"
+      spec.hasOwnProperty('statics'),
+      'spec must have statics property'
     );
     invariant(
-      spec.statics.hasOwnProperty("getKey"),
-      "statics.getKey must be a function"
+      spec.statics.hasOwnProperty('getKey'),
+      'statics.getKey must be a function'
     );
 
     const typeId = numTypes++;
 
     function getInstance(props) {
       let key = spec.statics.getKey(props);
-      invariant(typeof key === "string", "You must return a string key");
-      key = typeId + "~" + key;
+      invariant(typeof key === 'string', 'You must return a string key');
+      key = typeId + '~' + key;
       if (!serverQueries.hasOwnProperty(key)) {
         serverQueries[key] = createNewServerQuery(cache, key, spec);
       }
@@ -113,7 +113,7 @@ const WithServerQuery = {
 
     function invalidate(props) {
       var key = spec.statics.getKey(props);
-      key = typeId + "~" + key;
+      key = typeId + '~' + key;
       serverQueries = Object.keys(serverQueries).reduce((acc, k) => {
         const obj = acc;
         if (k !== key) {
