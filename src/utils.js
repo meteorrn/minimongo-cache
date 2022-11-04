@@ -7,7 +7,7 @@
  */
 // Utilities for db handling
 const _ = require("lodash");
-const { pluck } = require('../lib/utils');
+const { pluck } = require('../lib/utils')
 const { compileDocumentSelector } = require("./selector");
 const { compileSort } = require("./selector");
 
@@ -22,7 +22,8 @@ exports.compileDocumentSelector = compileDocumentSelector;
  * @return {*|Array}
  */
 exports.processFind = function processFind(items, selector, options) {
-  let filtered = _.filter(_.values(items), compileDocumentSelector(selector));
+  const values = _.values(items);
+  let filtered = values.filter(compileDocumentSelector(selector));
 
   // Handle geospatial operators
   filtered = processNearOperator(selector, filtered);
@@ -161,7 +162,7 @@ var processNearOperator = function (selector, list) {
         break;
       }
 
-      list = _.filter(list, (doc) => doc[key] && doc[key].type === "Point");
+      list = list.filter((doc) => doc[key] && doc[key].type === "Point");
 
       // Get distances
       let distances = _.map(list, (doc) => ({
@@ -176,17 +177,14 @@ var processNearOperator = function (selector, list) {
       }));
 
       // Filter non-points
-      distances = _.filter(distances, (item) => item.distance >= 0);
+      distances = distances.filter((item) => item.distance >= 0);
 
       // Sort by distance
       distances = _.sortBy(distances, "distance");
 
       // Filter by maxDistance
       if (value["$near"]["$maxDistance"]) {
-        distances = _.filter(
-          distances,
-          (item) => item.distance <= value["$near"]["$maxDistance"]
-        );
+        distances = distances.filter((item) => item.distance <= value["$near"]["$maxDistance"]);
       }
 
       // Limit to 100
@@ -301,7 +299,7 @@ var processGeoIntersectsOperator = function (selector, list) {
       }
 
       // Check within for each
-      list = _.filter(list, function (doc) {
+      list = list.filter((doc) => {
         // Reject non-points
         if (!doc[key] || doc[key].type !== "Point") {
           return false;
