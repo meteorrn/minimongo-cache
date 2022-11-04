@@ -7,7 +7,7 @@
  */
 // Utilities for db handling
 const _ = require("lodash");
-const { pluck, rest } = require('../lib/utils')
+const { pluck, rest, first } = require('../lib/utils')
 const { compileDocumentSelector } = require("./selector");
 const { compileSort } = require("./selector");
 
@@ -38,7 +38,7 @@ exports.processFind = function processFind(items, selector, options) {
   }
 
   if (options && options.limit) {
-    filtered = _.first(filtered, options.limit);
+    filtered = first(filtered, options.limit);
   }
 
   // Clone to prevent accidental updates, or apply fields if present
@@ -74,8 +74,8 @@ exports.filterFields = function filterFields(items, fields) {
     const newItem = {};
 
     // TODO move this check out of map to increase performance
-    // TODO: const inclusive = _.first(_.values(fields)) === 1
-    if (_.first(_.values(fields)) === 1) {
+    // TODO: const inclusive = first(_.values(fields)) === 1
+    if (first(_.values(fields)) === 1) {
       // Include fields
       for (field of Array.from(_.keys(fields).concat(["_id"]))) {
         path = field.split(".");
@@ -188,7 +188,7 @@ var processNearOperator = function (selector, list) {
       }
 
       // Limit to 100
-      distances = _.first(distances, 100);
+      distances = first(distances, 100);
 
       // Extract docs
       list = pluck(distances, "doc");
@@ -207,7 +207,7 @@ var processNearOperator = function (selector, list) {
 const pointInPolygon = function (point, polygon) {
   // Check that first == last
   if (
-    !_.isEqual(_.first(polygon.coordinates[0]), _.last(polygon.coordinates[0]))
+    !_.isEqual(first(polygon.coordinates[0]), _.last(polygon.coordinates[0]))
   ) {
     throw new Error("First must equal last");
   }
