@@ -1,13 +1,12 @@
-var _ = require("lodash");
-
 // we use the same mechanism as react-native does:
 // https://github.com/facebook/react-native/blob/main/Libraries/Utilities/binaryToBase64.js
 // so there are no extra deps when using rn
 // also, base64-js is fully js and browser-compatible
 const base64 = require("base64-js");
+const { hasProp, objSize, isArguments } = require('./helpers')
+const EJSON = {}; // Global!
+const customTypes = new Map();
 
-var EJSON = {}; // Global!
-var customTypes = {};
 
 /**
  * Add a custom type, using a method of your choice to get to and
@@ -24,16 +23,16 @@ var customTypes = {};
  * @param factory
  */
 EJSON.addType = function addType(name, factory) {
-  if (_.has(customTypes, name))
+  if (customTypes.has(name))
     throw new Error("Type " + name + " already present");
-  customTypes[name] = factory;
+  customTypes.set(name, factory);
 };
 
-var builtinConverters = [
+const builtinConverters = [
   {
     // Date
     matchJSONValue: function (obj) {
-      return _.has(obj, "$date") && _.size(obj) === 1;
+      return hasProp(obj, "$date") && objSize(obj) === 1;
     },
     matchObject: function (obj) {
       return obj instanceof Date;
@@ -48,12 +47,12 @@ var builtinConverters = [
   {
     // Binary
     matchJSONValue: function (obj) {
-      return _.has(obj, "$binary") && _.size(obj) === 1;
+      return hasProp(obj, "$binary") && objSize(obj) === 1;
     },
     matchObject: function (obj) {
       return (
         (typeof Uint8Array !== "undefined" && obj instanceof Uint8Array) ||
-        (obj && _.has(obj, "$Uint8ArrayPolyfill"))
+        (obj && hasProp(obj, "$Uint8ArrayPolyfill"))
       );
     },
     toJSONValue: function (obj) {
@@ -66,26 +65,28 @@ var builtinConverters = [
   {
     // Escaping one level
     matchJSONValue: function (obj) {
-      return _.has(obj, "$escape") && _.size(obj) === 1;
+      return hasProp(obj, "$escape") && objSize(obj) === 1;
     },
     matchObject: function (obj) {
-      if (_.isEmpty(obj) || _.size(obj) > 2) {
+      if (obj === null || obj === undefined) {
         return false;
       }
-      return _.any(builtinConverters, function (converter) {
-        return converter.matchJSONValue(obj);
-      });
+      const size = objSize(obj)
+      if (size === 0 || size > 2) {
+        return false;
+      }
+      return builtinConverters.some(converter => converter.matchJSONValue(obj));
     },
     toJSONValue: function (obj) {
-      var newObj = {};
-      _.each(obj, function (value, key) {
+      const newObj = {};
+      Object.entries(obj).forEach(([key, value]) => {
         newObj[key] = EJSON.toJSONValue(value);
       });
       return { $escape: newObj };
     },
     fromJSONValue: function (obj) {
-      var newObj = {};
-      _.each(obj.$escape, function (value, key) {
+      const newObj = {};
+      Object.entries(obj.$escape).forEach(([key, value]) => {
         newObj[key] = EJSON.fromJSONValue(value);
       });
       return newObj;
@@ -94,7 +95,7 @@ var builtinConverters = [
   {
     // Custom
     matchJSONValue: function (obj) {
-      return _.has(obj, "$type") && _.has(obj, "$value") && _.size(obj) === 2;
+      return hasProp(obj, "$type") && hasProp(obj, "$value") && objSize(obj) === 2;
     },
     matchObject: function (obj) {
       return EJSON._isCustomType(obj);
@@ -103,8 +104,8 @@ var builtinConverters = [
       return { $type: obj.typeName(), $value: obj.toJSONValue() };
     },
     fromJSONValue: function (obj) {
-      var typeName = obj.$type;
-      var converter = customTypes[typeName];
+      const typeName = obj.$type;
+      const converter = customTypes.get(typeName);
       return converter(obj.$value);
     },
   },
@@ -129,18 +130,18 @@ EJSON._isCustomType = function _isCustomType(obj) {
     obj &&
     typeof obj.toJSONValue === "function" &&
     typeof obj.typeName === "function" &&
-    _.has(customTypes, obj.typeName())
+    customTypes.has(obj.typeName())
   );
 };
 
 //for both arrays and objects, in-place modification.
-var adjustTypesToJSONValue = (EJSON._adjustTypesToJSONValue = function (obj) {
+const adjustTypesToJSONValue = (EJSON._adjustTypesToJSONValue = function (obj) {
   if (obj === null) return null;
-  var maybeChanged = toJSONValueHelper(obj);
+  const maybeChanged = toJSONValueHelper(obj);
   if (maybeChanged !== undefined) return maybeChanged;
-  _.each(obj, function (value, key) {
+  Object.entries(obj).forEach(([key, value]) => {
     if (typeof value !== "object" && value !== undefined) return; // continue
-    var changed = toJSONValueHelper(value);
+    const changed = toJSONValueHelper(value);
     if (changed) {
       obj[key] = changed;
       return; // on to the next key
@@ -154,9 +155,8 @@ var adjustTypesToJSONValue = (EJSON._adjustTypesToJSONValue = function (obj) {
 
 // Either return the JSON-compatible version of the argument, or undefined (if
 // the item isn't itself replaceable, but maybe some fields in it are)
-var toJSONValueHelper = function (item) {
-  for (var i = 0; i < builtinConverters.length; i++) {
-    var converter = builtinConverters[i];
+const toJSONValueHelper = function (item) {
+  for (const converter of builtinConverters) {
     if (converter.matchObject(item)) {
       return converter.toJSONValue(item);
     }
@@ -170,7 +170,7 @@ var toJSONValueHelper = function (item) {
  * @return {object}
  */
 EJSON.toJSONValue = function toJSONValue(item) {
-  var changed = toJSONValueHelper(item);
+  const changed = toJSONValueHelper(item);
   if (changed !== undefined) return changed;
   if (typeof item === "object") {
     item = EJSON.clone(item);
@@ -182,15 +182,15 @@ EJSON.toJSONValue = function toJSONValue(item) {
 //for both arrays and objects. Tries its best to just
 // use the object you hand it, but may return something
 // different if the object you hand it itself needs changing.
-var adjustTypesFromJSONValue = (EJSON._adjustTypesFromJSONValue = function (
+const adjustTypesFromJSONValue = (EJSON._adjustTypesFromJSONValue = function (
   obj
 ) {
   if (obj === null) return null;
-  var maybeChanged = fromJSONValueHelper(obj);
+  const maybeChanged = fromJSONValueHelper(obj);
   if (maybeChanged !== obj) return maybeChanged;
-  _.each(obj, function (value, key) {
+  Object.entries(obj).forEach(([key, value]) => {
     if (typeof value === "object") {
-      var changed = fromJSONValueHelper(value);
+      const changed = fromJSONValueHelper(value);
       if (value !== changed) {
         obj[key] = changed;
         return;
@@ -208,22 +208,20 @@ var adjustTypesFromJSONValue = (EJSON._adjustTypesFromJSONValue = function (
 
 // DOES NOT RECURSE.  For actually getting the fully-changed value, use
 // EJSON.fromJSONValue
-var fromJSONValueHelper = function (value) {
+const fromJSONValueHelper = function (value) {
   if (typeof value === "object" && value !== null) {
-    if (
-      _.size(value) <= 2 &&
-      _.all(value, function (v, k) {
-        return typeof k === "string" && k.substr(0, 1) === "$";
-      })
-    ) {
-      for (var i = 0; i < builtinConverters.length; i++) {
-        var converter = builtinConverters[i];
+    const keys = Object.keys(value)
+
+    if (keys.length <= 2 &&
+      keys.every(k => typeof k === "string" && k.substr(0, 1) === "$")) {
+      for (const converter of builtinConverters) {
         if (converter.matchJSONValue(value)) {
           return converter.fromJSONValue(value);
         }
       }
     }
   }
+
   return value;
 };
 
@@ -233,7 +231,7 @@ var fromJSONValueHelper = function (value) {
  * @return {object}
  */
 EJSON.fromJSONValue = function fromJSONValue(item) {
-  var changed = fromJSONValueHelper(item);
+  const changed = fromJSONValueHelper(item);
   if (changed === item && typeof item === "object") {
     item = EJSON.clone(item);
     adjustTypesFromJSONValue(item);
@@ -286,8 +284,8 @@ EJSON.isBinary = function isBinary(obj) {
  * @return {*}
  */
 EJSON.equals = function quals(a, b, options) {
-  var i;
-  var keyOrderSensitive = !!(options && options.keyOrderSensitive);
+  let i;
+  const keyOrderSensitive = !!(options && options.keyOrderSensitive);
   if (a === b) return true;
   if (!a || !b)
     // if either one is falsy, they'd have to be === to be equal
@@ -321,14 +319,11 @@ EJSON.equals = function quals(a, b, options) {
     return true;
   }
   // fall back to structural equality of objects
-  var ret;
+  let ret;
   if (keyOrderSensitive) {
-    var bKeys = [];
-    _.each(b, function (val, x) {
-      bKeys.push(x);
-    });
+    const bKeys = Object.keys(b);
     i = 0;
-    ret = _.all(a, function (val, x) {
+    ret = Object.entries(a).every(([x, val]) => {
       if (i >= bKeys.length) {
         return false;
       }
@@ -344,8 +339,8 @@ EJSON.equals = function quals(a, b, options) {
     return ret && i === bKeys.length;
   } else {
     i = 0;
-    ret = _.all(a, function (val, key) {
-      if (!_.has(b, key)) {
+    ret = Object.entries(a).every(([key, val]) => {
+      if (!hasProp(b, key)) {
         return false;
       }
       if (!EJSON.equals(val, b[key], options)) {
@@ -354,7 +349,7 @@ EJSON.equals = function quals(a, b, options) {
       i++;
       return true;
     });
-    return ret && _.size(b) === i;
+    return ret && objSize(b) === i;
   }
 };
 
@@ -364,19 +359,18 @@ EJSON.equals = function quals(a, b, options) {
  * @return {*}
  */
 EJSON.clone = function clone(v) {
-  var ret;
+  let ret;
   if (typeof v !== "object") return v;
   if (v === null) return null; // null has typeof "object"
   if (v instanceof Date) return new Date(v.getTime());
   if (EJSON.isBinary(v)) {
     return Uint8Array.from(v);
   }
-  if (_.isArray(v) || _.isArguments(v)) {
+  if (Array.isArray(v) || isArguments(v)) {
     // For some reason, _.map doesn't work in this context on Opera (weird test
     // failures).
-    ret = [];
-    for (i = 0; i < v.length; i++) ret[i] = EJSON.clone(v[i]);
-    return ret;
+    // TODO test with newer opera
+    return v.map(entry => EJSON.clone(entry));
   }
   // handle general user-defined typed Objects if they have a clone method
   if (typeof v.clone === "function") {
@@ -384,7 +378,7 @@ EJSON.clone = function clone(v) {
   }
   // handle other objects
   ret = {};
-  _.each(v, function (value, key) {
+  Object.entries(v).forEach(([key, value]) => {
     ret[key] = EJSON.clone(value);
   });
   return ret;
