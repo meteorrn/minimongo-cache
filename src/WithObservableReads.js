@@ -3,10 +3,8 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const ReadTransaction = require("./ReadTransaction");
-
-const _ = require("lodash");
-
+const ReadTransaction = require('./ReadTransaction');
+const { arraysAreEqual } = require('./tools');
 class ObservableRead {
   constructor(db, func, context) {
     this.db = db;
@@ -16,7 +14,7 @@ class ObservableRead {
     this.lastValue = null;
     this.subscribers = [];
     this.changeListener = this.changeListener.bind(this);
-    this.db.on("change", this.changeListener);
+    this.db.on('change', this.changeListener);
     this.rerunTransaction();
   }
 
@@ -27,7 +25,7 @@ class ObservableRead {
   }
 
   dispose() {
-    return this.db.removeListener("change", this.changeListener);
+    return this.db.removeListener('change', this.changeListener);
   }
 
   rerunTransaction() {
@@ -41,7 +39,7 @@ class ObservableRead {
     // If we read different data this time, notify of a change. This saves render() time
     if (
       !this.lastReadTransaction ||
-      !_.isEqual(this.lastReadTransaction.log, nextReadTransaction.log)
+      !arraysAreEqual(this.lastReadTransaction.log, nextReadTransaction.log)
     ) {
       this.lastReadTransaction = nextReadTransaction;
       const prevValue = this.lastValue;
@@ -61,7 +59,9 @@ class ObservableRead {
       return;
     }
 
-    for (let collectionName in changeRecords) {
+    const names = Object.getOwnPropertyNames(changeRecords);
+
+    for (const collectionName of names) {
       // Did we scan the collection?
       if (this.lastReadTransaction.dirtyScans[collectionName]) {
         this.rerunTransaction();

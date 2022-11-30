@@ -6,7 +6,7 @@
 var app = app || {};
 
 (function () {
-  "use strict";
+  'use strict';
 
   var ESCAPE_KEY = 27;
   var ENTER_KEY = 13;

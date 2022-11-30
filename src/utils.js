@@ -1,15 +1,18 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+/**
+ * Utilities for db handling
  */
-// Utilities for db handling
-const _ = require("lodash");
 
-const { compileDocumentSelector } = require("./selector");
-const { compileSort } = require("./selector");
+const {
+  pluck,
+  rest,
+  first,
+  last,
+  initial,
+  arraysAreEqual,
+  sortBy,
+} = require('./tools');
+const { compileDocumentSelector } = require('./selector');
+const { compileSort } = require('./selector');
 
 // Compile a document selector (query) to a lambda function
 exports.compileDocumentSelector = compileDocumentSelector;
@@ -22,7 +25,8 @@ exports.compileDocumentSelector = compileDocumentSelector;
  * @return {*|Array}
  */
 exports.processFind = function processFind(items, selector, options) {
-  let filtered = _.filter(_.values(items), compileDocumentSelector(selector));
+  const values = Object.values(items);
+  let filtered = values.filter(compileDocumentSelector(selector));
 
   // Handle geospatial operators
   filtered = processNearOperator(selector, filtered);
@@ -33,11 +37,11 @@ exports.processFind = function processFind(items, selector, options) {
   }
 
   if (options && options.skip) {
-    filtered = _.rest(filtered, options.skip);
+    filtered = rest(filtered, options.skip);
   }
 
   if (options && options.limit) {
-    filtered = _.first(filtered, options.limit);
+    filtered = first(filtered, options.limit);
   }
 
   // Clone to prevent accidental updates, or apply fields if present
@@ -61,23 +65,23 @@ exports.filterFields = function filterFields(items, fields) {
   if (fields == null) {
     fields = {};
   }
-  if (_.keys(fields).length === 0) {
+  if (Object.keys(fields).length === 0) {
     return items;
   }
 
   // TODO throw if fields contain both inclusive and exclusive criteria
 
   // For each item
-  return _.map(items, function (item) {
+  return items.map((item) => {
     let field, from, obj, path, pathElem;
     const newItem = {};
 
     // TODO move this check out of map to increase performance
-    // TODO: const inclusive = _.first(_.values(fields)) === 1
-    if (_.first(_.values(fields)) === 1) {
+
+    if (first(Object.values(fields)) === 1) {
       // Include fields
-      for (field of Array.from(_.keys(fields).concat(["_id"]))) {
-        path = field.split(".");
+      for (field of Array.from(Object.keys(fields).concat(['_id']))) {
+        path = field.split('.');
 
         // Determine if path exists
         obj = item;
@@ -94,7 +98,7 @@ exports.filterFields = function filterFields(items, fields) {
         // Go into path, creating as necessary
         from = item;
         let to = newItem;
-        for (pathElem of Array.from(_.initial(path))) {
+        for (pathElem of Array.from(initial(path))) {
           to[pathElem] = to[pathElem] || {};
 
           // Move inside
@@ -103,18 +107,18 @@ exports.filterFields = function filterFields(items, fields) {
         }
 
         // Copy value
-        to[_.last(path)] = from[_.last(path)];
+        to[last(path)] = from[last(path)];
       }
 
       return newItem;
     } else {
       // Exclude fields
-      for (field of Array.from(_.keys(fields).concat(["_id"]))) {
-        path = field.split(".");
+      for (field of Array.from(Object.keys(fields).concat(['_id']))) {
+        path = field.split('.');
 
         // Go inside path
         obj = item;
-        for (pathElem of Array.from(_.initial(path))) {
+        for (pathElem of Array.from(initial(path))) {
           if (obj) {
             obj = obj[pathElem];
           }
@@ -125,7 +129,7 @@ exports.filterFields = function filterFields(items, fields) {
           continue;
         }
 
-        delete obj[_.last(path)];
+        delete obj[last(path)];
       }
 
       return item;
@@ -133,7 +137,7 @@ exports.filterFields = function filterFields(items, fields) {
   });
 };
 
-const pattern = "xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx";
+const pattern = 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx';
 
 /**
  * Creates a unique identifier string of 32 characters length.
@@ -142,7 +146,7 @@ const pattern = "xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx";
 exports.createUid = () =>
   pattern.replace(/[xy]/g, function (c) {
     const r = (Math.random() * 16) | 0;
-    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 
@@ -152,19 +156,21 @@ exports.createUid = () =>
  * @param list
  * @return {*}
  */
-var processNearOperator = function (selector, list) {
-  for (var key in selector) {
-    var value = selector[key];
-    if (value != null && value["$near"]) {
-      var geo = value["$near"]["$geometry"];
-      if (geo.type !== "Point") {
+const processNearOperator = function (selector, list) {
+  const keys = Object.keys(selector || {});
+
+  for (const key of keys) {
+    const value = selector[key];
+    if (value != null && value['$near']) {
+      const geo = value['$near']['$geometry'];
+      if (geo.type !== 'Point') {
         break;
       }
 
-      list = _.filter(list, (doc) => doc[key] && doc[key].type === "Point");
+      list = list.filter((doc) => doc[key] && doc[key].type === 'Point');
 
       // Get distances
-      let distances = _.map(list, (doc) => ({
+      let distances = list.map((doc) => ({
         doc,
 
         distance: getDistanceFromLatLngInM(
@@ -176,24 +182,23 @@ var processNearOperator = function (selector, list) {
       }));
 
       // Filter non-points
-      distances = _.filter(distances, (item) => item.distance >= 0);
+      distances = distances.filter((item) => item.distance >= 0);
 
       // Sort by distance
-      distances = _.sortBy(distances, "distance");
+      distances = distances.sort(sortBy('distance'));
 
       // Filter by maxDistance
-      if (value["$near"]["$maxDistance"]) {
-        distances = _.filter(
-          distances,
-          (item) => item.distance <= value["$near"]["$maxDistance"]
+      if (value['$near']['$maxDistance']) {
+        distances = distances.filter(
+          (item) => item.distance <= value['$near']['$maxDistance']
         );
       }
 
       // Limit to 100
-      distances = _.first(distances, 100);
+      distances = first(distances, 100);
 
       // Extract docs
-      list = _.pluck(distances, "doc");
+      list = pluck(distances, 'doc');
     }
   }
   return list;
@@ -208,49 +213,37 @@ var processNearOperator = function (selector, list) {
  */
 const pointInPolygon = function (point, polygon) {
   // Check that first == last
-  if (
-    !_.isEqual(_.first(polygon.coordinates[0]), _.last(polygon.coordinates[0]))
-  ) {
-    throw new Error("First must equal last");
+  const firstEntry = first(polygon.coordinates[0]);
+  const lastEntry = last(polygon.coordinates[0]);
+
+  if (!arraysAreEqual(firstEntry, lastEntry)) {
+    throw new Error('First must equal last');
   }
 
+  const coordinates = polygon.coordinates[0] || [];
+  const firstCoordinates = coordinates.map((coord) => coord[0]);
+  const firstPoint = point.coordinates[0];
+  const secondPoint = point.coordinates[1];
+
   // Check bounds
-  if (
-    point.coordinates[0] <
-    Math.min.apply(
-      this,
-      _.map(polygon.coordinates[0], (coord) => coord[0])
-    )
-  ) {
+  if (firstPoint < Math.min.apply(this, firstCoordinates)) {
     return false;
   }
-  if (
-    point.coordinates[1] <
-    Math.min.apply(
-      this,
-      _.map(polygon.coordinates[0], (coord) => coord[1])
-    )
-  ) {
+
+  const secondCoordinates = coordinates.map((coord) => coord[1]);
+
+  if (secondPoint < Math.min.apply(this, secondCoordinates)) {
     return false;
   }
-  if (
-    point.coordinates[0] >
-    Math.max.apply(
-      this,
-      _.map(polygon.coordinates[0], (coord) => coord[0])
-    )
-  ) {
+
+  if (firstPoint > Math.max.apply(this, firstCoordinates)) {
     return false;
   }
-  if (
-    point.coordinates[1] >
-    Math.max.apply(
-      this,
-      _.map(polygon.coordinates[0], (coord) => coord[1])
-    )
-  ) {
+
+  if (secondPoint > Math.max.apply(this, secondCoordinates)) {
     return false;
   }
+
   return true;
 };
 
@@ -263,7 +256,7 @@ const pointInPolygon = function (point, polygon) {
  * @param lng2
  * @return {number}
  */
-var getDistanceFromLatLngInM = function (lat1, lng1, lat2, lng2) {
+const getDistanceFromLatLngInM = function (lat1, lng1, lat2, lng2) {
   const R = 6370986; // Radius of the earth in m
   const dLat = deg2rad(lat2 - lat1); // deg2rad below
   const dLng = deg2rad(lng2 - lng1);
@@ -283,7 +276,7 @@ var getDistanceFromLatLngInM = function (lat1, lng1, lat2, lng2) {
  * @param deg
  * @return {number}
  */
-var deg2rad = (deg) => deg * (Math.PI / 180);
+const deg2rad = (deg) => deg * (Math.PI / 180);
 
 /**
  * @private
@@ -291,19 +284,21 @@ var deg2rad = (deg) => deg * (Math.PI / 180);
  * @param list
  * @return {*}
  */
-var processGeoIntersectsOperator = function (selector, list) {
-  for (var key in selector) {
+const processGeoIntersectsOperator = function (selector, list) {
+  const keys = Object.keys(selector || {});
+
+  for (const key of keys) {
     const value = selector[key];
-    if (value != null && value["$geoIntersects"]) {
-      var geo = value["$geoIntersects"]["$geometry"];
-      if (geo.type !== "Polygon") {
+    if (value != null && value['$geoIntersects']) {
+      const geo = value['$geoIntersects']['$geometry'];
+      if (geo.type !== 'Polygon') {
         break;
       }
 
       // Check within for each
-      list = _.filter(list, function (doc) {
+      list = list.filter((doc) => {
         // Reject non-points
-        if (!doc[key] || doc[key].type !== "Point") {
+        if (!doc[key] || doc[key].type !== 'Point') {
           return false;
         }
 
@@ -333,12 +328,12 @@ exports.regularizeUpsert = function regularizeUpsert(
   error
 ) {
   // Handle case of bases not present
-  if (_.isFunction(bases)) {
+  if (typeof bases === 'function') {
     [bases, success, error] = Array.from([undefined, bases, success]);
   }
 
   // Handle single upsert
-  if (!_.isArray(docs)) {
+  if (!Array.isArray(docs)) {
     docs = [docs];
     bases = [bases];
   } else {
@@ -346,7 +341,7 @@ exports.regularizeUpsert = function regularizeUpsert(
   }
 
   // Make into list of { doc: .., base: }
-  const items = _.map(docs, (doc, i) => ({
+  const items = docs.map((doc, i) => ({
     doc,
     base: i < bases.length ? bases[i] : undefined,
   }));
@@ -354,7 +349,7 @@ exports.regularizeUpsert = function regularizeUpsert(
   // check for _id
   for (let item of Array.from(items)) {
     if (item.doc._id == null) {
-      throw new Error("All documents in the upsert must have an _id");
+      throw new Error('All documents in the upsert must have an _id');
     }
   }
 

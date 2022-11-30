@@ -6,11 +6,11 @@
 var app = app || {};
 
 (function () {
-  "use strict";
+  'use strict';
 
-  app.ALL_TODOS = "all";
-  app.ACTIVE_TODOS = "active";
-  app.COMPLETED_TODOS = "completed";
+  app.ALL_TODOS = 'all';
+  app.ACTIVE_TODOS = 'active';
+  app.COMPLETED_TODOS = 'completed';
   var TodoFooter = app.TodoFooter;
   var TodoItem = app.TodoItem;
 
@@ -23,18 +23,18 @@ var app = app || {};
       return {
         nowShowing: app.ALL_TODOS,
         editing: null,
-        newTodo: "",
+        newTodo: '',
       };
     },
 
     componentDidMount: function () {
       var setState = this.setState;
       var router = Router({
-        "/": setState.bind(this, { nowShowing: app.ALL_TODOS }),
-        "/active": setState.bind(this, { nowShowing: app.ACTIVE_TODOS }),
-        "/completed": setState.bind(this, { nowShowing: app.COMPLETED_TODOS }),
+        '/': setState.bind(this, { nowShowing: app.ALL_TODOS }),
+        '/active': setState.bind(this, { nowShowing: app.ACTIVE_TODOS }),
+        '/completed': setState.bind(this, { nowShowing: app.COMPLETED_TODOS }),
       });
-      router.init("/");
+      router.init('/');
     },
 
     handleChange: function (event) {
@@ -52,7 +52,7 @@ var app = app || {};
 
       if (val) {
         app.TodoDomain.addTodo(val);
-        this.setState({ newTodo: "" });
+        this.setState({ newTodo: '' });
       }
     },
 
@@ -172,7 +172,7 @@ var app = app || {};
   });
 
   function render() {
-    React.render(<TodoApp />, document.getElementsByClassName("todoapp")[0]);
+    React.render(<TodoApp />, document.getElementsByClassName('todoapp')[0]);
   }
 
   render();
