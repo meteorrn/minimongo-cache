@@ -1,6 +1,6 @@
 {
   "name": "@meteorrn/minimongo",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Fork of minimongo designed for caching",
   "main": "index.js",
   "scripts": {
