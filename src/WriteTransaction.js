@@ -4,9 +4,9 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const { each } = require('./tools');
-const NullTransaction = require('./NullTransaction');
-const { preventProto } = require('./utils');
+const { each } = require("./tools");
+const NullTransaction = require("./NullTransaction");
+const { preventProto } = require("./utils");
 
 class WriteTransaction extends NullTransaction {
   constructor(db) {
@@ -19,7 +19,7 @@ class WriteTransaction extends NullTransaction {
 
   _ensureQueued() {
     if (this.db.debug) {
-      this.traces[new Error().stack.split('\n').slice(1).join('\n')] = true;
+      this.traces[new Error().stack.split("\n").slice(1).join("\n")] = true;
     }
 
     if (!this.queued) {
@@ -54,7 +54,7 @@ class WriteTransaction extends NullTransaction {
   } // nested writes would be bad, but impossible.
 
   _flush() {
-    const ReadOnlyTransaction = require('./ReadOnlyTransaction');
+    const ReadOnlyTransaction = require("./ReadOnlyTransaction");
 
     const changeRecords = {};
     each(this.dirtyIds, (collectionName) => {
@@ -85,7 +85,7 @@ class WriteTransaction extends NullTransaction {
           };
 
           try {
-            return this.db.emit('change', changeRecords);
+            return this.db.emit("change", changeRecords);
           } catch (error) {
             e = error;
             return this.db.uncaughtExceptionHandler(e);
@@ -94,7 +94,7 @@ class WriteTransaction extends NullTransaction {
           }
         } else {
           try {
-            return this.db.emit('change', changeRecords);
+            return this.db.emit("change", changeRecords);
           } catch (error1) {
             e = error1;
             return this.db.uncaughtExceptionHandler(e);

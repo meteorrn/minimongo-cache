@@ -1,5 +1,5 @@
-const EventEmitter = require('eventemitter3');
-const WriteTransaction = require('./WriteTransaction');
+const EventEmitter = require("eventemitter3");
+const WriteTransaction = require("./WriteTransaction");
 const WithObservableWrites = {
   getDefaultTransaction() {
     this.setMaxListeners(0);

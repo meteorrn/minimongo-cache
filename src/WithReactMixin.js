@@ -4,7 +4,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const invariant = require('invariant');
+const invariant = require("invariant");
 
 const createMixin = function (db) {
   let Mixin;

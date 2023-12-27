@@ -1,17 +1,17 @@
-const { randomHex } = require('../helpers/randomHex');
+const { randomHex } = require("../helpers/randomHex");
 const {
   createUid,
   filterFields,
   processFind,
   regularizeUpsert,
-} = require('../../src/utils');
-const { expect } = require('chai');
+} = require("../../src/utils");
+const { expect } = require("chai");
 
-describe('utils', function () {
+describe("utils", function () {
   describe(createUid.name, function () {
     const uidRegExp = /^[a-f0-9]{32}$/;
 
-    it('creates a new random id each time', function () {
+    it("creates a new random id each time", function () {
       const created = new Set();
       const max = 100000;
 
@@ -25,10 +25,10 @@ describe('utils', function () {
     });
   });
   describe(processFind.name, function () {
-    it('Processes a find', function () {
+    it("Processes a find", function () {
       const items = [
-        { foo: 'bar', _id: randomHex() },
-        { bar: 'baz', _id: randomHex() },
+        { foo: "bar", _id: randomHex() },
+        { bar: "baz", _id: randomHex() },
       ];
       const selector = {};
       const options = {};
@@ -36,10 +36,10 @@ describe('utils', function () {
       const found = processFind(items, selector, options);
       expect(found).to.deep.equal(items);
     });
-    it('processes a filter', function () {
+    it("processes a filter", function () {
       const items = [
-        { foo: 'bar', _id: randomHex() },
-        { bar: 'baz', _id: randomHex() },
+        { foo: "bar", _id: randomHex() },
+        { bar: "baz", _id: randomHex() },
       ];
       const selector = { _id: items[1]._id };
 
@@ -51,20 +51,20 @@ describe('utils', function () {
       const foundAll = processFind(items, { _id: { $in: ids } });
       expect(foundAll).to.deep.equal(items);
     });
-    it('processes a skip', function () {
+    it("processes a skip", function () {
       const items = [
-        { foo: 'bar', _id: randomHex() },
-        { bar: 'baz', _id: randomHex() },
+        { foo: "bar", _id: randomHex() },
+        { bar: "baz", _id: randomHex() },
       ];
       const selector = {};
 
       const found = processFind(items, selector, { skip: 1 });
       expect(found).to.deep.equal([items[1]]);
     });
-    it('processes a sort', function () {
+    it("processes a sort", function () {
       const items = [
-        { foo: 'bar', _id: randomHex() },
-        { foo: 'baz', _id: randomHex() },
+        { foo: "bar", _id: randomHex() },
+        { foo: "baz", _id: randomHex() },
       ];
       const selector = {};
 
@@ -78,10 +78,10 @@ describe('utils', function () {
       const found3 = processFind(items, selector, { sort: { bar: -1 } });
       expect(found3).to.deep.equal(items);
     });
-    it('processes a limit', function () {
+    it("processes a limit", function () {
       const items = [
-        { foo: 'bar', _id: randomHex() },
-        { bar: 'baz', _id: randomHex() },
+        { foo: "bar", _id: randomHex() },
+        { bar: "baz", _id: randomHex() },
       ];
       const selector = {};
       const options = { limit: 1 };
@@ -89,10 +89,10 @@ describe('utils', function () {
       const found = processFind(items, selector, options);
       expect(found).to.deep.equal([items[0]]);
     });
-    it('filters fields', function () {
+    it("filters fields", function () {
       const items = [
-        { foo: 'bar', _id: randomHex() },
-        { foo: 'baz', _id: randomHex() },
+        { foo: "bar", _id: randomHex() },
+        { foo: "baz", _id: randomHex() },
         null,
       ];
       const selector = {};
@@ -103,43 +103,43 @@ describe('utils', function () {
     });
   });
   describe(filterFields.name, function () {
-    it('handles trivial cases', function () {
+    it("handles trivial cases", function () {
       expect(filterFields()).to.equal(undefined);
       expect(filterFields(null)).to.equal(null);
     });
-    it('default includes _id when not exlcuded', function () {
+    it("default includes _id when not exlcuded", function () {
       const items = [
-        { foo: 'bar', _id: randomHex() },
-        { foo: 'baz', _id: randomHex() },
+        { foo: "bar", _id: randomHex() },
+        { foo: "baz", _id: randomHex() },
       ];
       expect(filterFields(items, { foo: 1 })).to.deep.equal(items);
     });
-    it('filters by given inclusion criteria', function () {
+    it("filters by given inclusion criteria", function () {
       const items = [
-        { foo: 'bar', bar: 'baz', _id: randomHex() },
-        { foo: 'baz', bar: 'foo', _id: randomHex() },
+        { foo: "bar", bar: "baz", _id: randomHex() },
+        { foo: "baz", bar: "foo", _id: randomHex() },
       ];
       const expected = items.map((i) => ({ foo: i.foo, _id: i._id }));
       expect(filterFields(items, { foo: 1 })).to.deep.equal(expected);
     });
-    it('filters by given exclusion criteria', function () {
+    it("filters by given exclusion criteria", function () {
       const items = [
-        { foo: 'bar', bar: 'baz', _id: randomHex() },
-        { foo: 'baz', bar: 'foo', _id: randomHex() },
+        { foo: "bar", bar: "baz", _id: randomHex() },
+        { foo: "baz", bar: "foo", _id: randomHex() },
         null,
       ];
       const expected = items.map((i) => i && { bar: i.bar });
       expect(filterFields(items, { foo: 0 })).to.deep.equal(expected);
     });
-    it('throws if inclusion and exclusion criteria exist at the same time');
+    it("throws if inclusion and exclusion criteria exist at the same time");
   });
   describe(regularizeUpsert.name, function () {
-    it('does Tidy up upsert parameters to always be a list of { doc: <doc>, base: <base> }', function () {
+    it("does Tidy up upsert parameters to always be a list of { doc: <doc>, base: <base> }", function () {
       const items = [
-        { foo: 'bar', _id: randomHex() },
-        { bar: 'baz', _id: randomHex() },
+        { foo: "bar", _id: randomHex() },
+        { bar: "baz", _id: randomHex() },
       ];
-      const bases = [{ foo: 'bar' }];
+      const bases = [{ foo: "bar" }];
       const success = () => {};
       const error = () => {};
       expect(regularizeUpsert(items, bases, success, error)).to.deep.equal([
@@ -162,9 +162,9 @@ describe('utils', function () {
         [[{ doc: items[0], base: undefined }], getBase, success]
       );
     });
-    it('is making sure that _id is present', function () {
-      expect(() => regularizeUpsert([{ foo: 'bar' }])).to.throw(
-        'All documents in the upsert must have an _id'
+    it("is making sure that _id is present", function () {
+      expect(() => regularizeUpsert([{ foo: "bar" }])).to.throw(
+        "All documents in the upsert must have an _id"
       );
     });
   });

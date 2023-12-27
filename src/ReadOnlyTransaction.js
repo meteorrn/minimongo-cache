@@ -1,5 +1,5 @@
-const NullTransaction = require('./NullTransaction');
-const WriteTransaction = require('./WriteTransaction');
+const NullTransaction = require("./NullTransaction");
+const WriteTransaction = require("./WriteTransaction");
 
 class ReadOnlyTransaction extends NullTransaction {
   canPushTransaction(transaction) {
