@@ -6,7 +6,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 let MemoryDb;
-
+const EventEmitter = require("eventemitter3");
 const NullTransaction = require("./NullTransaction");
 const WithObservableReads = require("./WithObservableReads");
 const WithObservableWrites = require("./WithObservableWrites");
@@ -19,8 +19,9 @@ const { hasOwn, each } = require("./tools");
 // TODO: use ImmutableJS (requires changing selector.js which will
 // be painful). This will also let us do MVCC.
 
-module.exports = MemoryDb = class MemoryDb {
+module.exports = MemoryDb = class MemoryDb extends EventEmitter {
   constructor() {
+    super()
     this.collections = {};
     this.debug = true;
     this.batchedUpdates = (cb) => cb();

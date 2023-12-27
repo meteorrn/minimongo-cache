@@ -1,2 +1,5 @@
 node_modules
-test/browserified.js
+test/
+.github/
+coverage/
+.nyc_output/
