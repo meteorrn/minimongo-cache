@@ -8,10 +8,6 @@ on:
     branches:
       - master
   pull_request:
-    # runs on all PR that are not drafts
-    # also runs on "synchronize" which means, when there is a push
-    # to the current branch that is used to open the PR (target branch) 
-    types: [review_requested, ready_for_review, synchronize]
 
 jobs:
   unittest:
@@ -37,6 +33,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-${{ matrix.node }}
     - run: npm ci
+    - run: npm run lint
     - run: npm run test
     # TODO: replace prior line with the following, once coverage is implemented
     # - run: npm run test:coverage
