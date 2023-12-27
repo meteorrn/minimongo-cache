@@ -355,3 +355,14 @@ exports.regularizeUpsert = function regularizeUpsert(
 
   return [items, success, error];
 };
+
+/**
+ * Throws an Error if a property name is part of the Object prototype-chain.
+ * @param name {string}
+ * @throws {Error}
+ */
+exports.preventProto = (name) => {
+  if (name in {}) {
+    throw new Error(`Not allowed: ${name} is a prototype property.`);
+  }
+};

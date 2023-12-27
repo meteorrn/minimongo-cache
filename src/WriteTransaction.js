@@ -6,6 +6,7 @@
  */
 const { each } = require('./tools');
 const NullTransaction = require('./NullTransaction');
+const { preventProto } = require('./utils');
 
 class WriteTransaction extends NullTransaction {
   constructor(db) {
@@ -28,6 +29,7 @@ class WriteTransaction extends NullTransaction {
   }
 
   upsert(collectionName, result, docs) {
+    preventProto(collectionName);
     if (!Array.isArray(docs)) {
       docs = [docs];
     }
@@ -40,6 +42,7 @@ class WriteTransaction extends NullTransaction {
   }
 
   del(collectionName, result, id) {
+    preventProto(collectionName);
     this.dirtyIds[collectionName] = this.dirtyIds[collectionName] || {};
     this.dirtyIds[collectionName][id] = true;
     this._ensureQueued();
