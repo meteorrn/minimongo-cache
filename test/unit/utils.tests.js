@@ -153,18 +153,18 @@ describe("utils", function () {
 
       // single params
       expect(
-        regularizeUpsert(items[0], bases[0], success, error)
+        regularizeUpsert(items[0], bases[0], success, error),
       ).to.deep.equal([[{ doc: items[0], base: bases[0] }], success, error]);
 
       // bases from function
       const getBase = () => bases[0];
       expect(regularizeUpsert(items[0], getBase, success, error)).to.deep.equal(
-        [[{ doc: items[0], base: undefined }], getBase, success]
+        [[{ doc: items[0], base: undefined }], getBase, success],
       );
     });
     it("is making sure that _id is present", function () {
       expect(() => regularizeUpsert([{ foo: "bar" }])).to.throw(
-        "All documents in the upsert must have an _id"
+        "All documents in the upsert must have an _id",
       );
     });
   });

@@ -115,7 +115,7 @@ class Collection {
       this.name,
       this._findFetch(selector, options),
       selector,
-      options
+      options,
     );
   }
 
@@ -124,7 +124,7 @@ class Collection {
       this.name,
       this._findOne(selector, options),
       selector,
-      options
+      options,
     );
   }
 

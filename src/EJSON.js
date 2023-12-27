@@ -74,7 +74,7 @@ const builtinConverters = [
         return false;
       }
       return builtinConverters.some((converter) =>
-        converter.matchJSONValue(obj)
+        converter.matchJSONValue(obj),
       );
     },
     toJSONValue: function (obj) {
@@ -185,7 +185,7 @@ EJSON.toJSONValue = function toJSONValue(item) {
 // use the object you hand it, but may return something
 // different if the object you hand it itself needs changing.
 const adjustTypesFromJSONValue = (EJSON._adjustTypesFromJSONValue = function (
-  obj
+  obj,
 ) {
   if (obj === null) return null;
   const maybeChanged = fromJSONValueHelper(obj);

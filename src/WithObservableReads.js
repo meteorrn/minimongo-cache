@@ -33,7 +33,7 @@ class ObservableRead {
     const value = this.db.withTransaction(
       nextReadTransaction,
       this.func,
-      this.context
+      this.context,
     );
 
     // If we read different data this time, notify of a change. This saves render() time

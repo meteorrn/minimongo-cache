@@ -12,7 +12,7 @@ const createMixin = function (db) {
     componentWillMount() {
       invariant(
         this.observeData != null,
-        `You must implement observeData: ${this.constructor.displayName}`
+        `You must implement observeData: ${this.constructor.displayName}`,
       );
       this.subscription = null;
       this.prevData = null;
@@ -33,7 +33,7 @@ const createMixin = function (db) {
           nextProps,
           nextState,
           nextData,
-          nextContext
+          nextContext,
         );
       } finally {
         this.data = nextData;

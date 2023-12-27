@@ -8,13 +8,13 @@ describe("SynchronousWriteTransaction", function () {
 
     const result = { _id: randomHex, foo: "bar" };
     expect(() => transaction.get()).to.throw(
-      "Cannot read in a SynchronousWriteTransaction"
+      "Cannot read in a SynchronousWriteTransaction",
     );
     expect(() => transaction.find()).to.throw(
-      "Cannot read in a SynchronousWriteTransaction"
+      "Cannot read in a SynchronousWriteTransaction",
     );
     expect(() => transaction.findOne()).to.throw(
-      "Cannot read in a SynchronousWriteTransaction"
+      "Cannot read in a SynchronousWriteTransaction",
     );
 
     expect(transaction.upsert("", result)).to.deep.equal(result);

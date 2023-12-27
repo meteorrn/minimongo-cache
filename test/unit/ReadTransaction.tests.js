@@ -59,7 +59,7 @@ describe("ReadTransaction", function () {
   describe("canPushTransaction", function () {
     it("can only push SynchronousWriteTransacitons", function () {
       expect(
-        transaction.canPushTransaction(new SynchronousWriteTransaction())
+        transaction.canPushTransaction(new SynchronousWriteTransaction()),
       ).to.equal(true);
       [
         NullTransaction,
@@ -67,7 +67,7 @@ describe("ReadTransaction", function () {
         ReadOnlyTransaction,
         WriteTransaction,
       ].forEach((T) =>
-        expect(transaction.canPushTransaction(new T())).to.equal(false)
+        expect(transaction.canPushTransaction(new T())).to.equal(false),
       );
     });
   });

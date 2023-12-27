@@ -13,14 +13,14 @@ describe("selector", function () {
       const sortAsc = compileSort({ _id: 1 });
       const arr = [{ _id: () => {} }, { _id: () => {} }];
       expect(() => arr.sort(sortAsc)).to.throw(
-        "Sorting not supported on Javascript code"
+        "Sorting not supported on Javascript code",
       );
     });
     it("throws on sorting regex", function () {
       const sortAsc = compileSort({ _id: 1 });
       const arr = [{ _id: /ab/ }, { _id: /bc/ }];
       expect(() => arr.sort(sortAsc)).to.throw(
-        "Sorting not supported on regular expression"
+        "Sorting not supported on regular expression",
       );
     });
     it("keeps unsported if empty", function () {
@@ -220,7 +220,7 @@ describe("selector", function () {
             if (_id == value) return;
             expect(
               selector({ _id }),
-              JSON.stringify({ value, _id })
+              JSON.stringify({ value, _id }),
             ).to.deep.equal(false);
           });
         });
@@ -253,12 +253,12 @@ describe("selector", function () {
 
       it("throws on inconsistent selectors", function () {
         expect(() =>
-          compileDocumentSelector({ _id: { $lt: 1, lt: 2 } })
+          compileDocumentSelector({ _id: { $lt: 1, lt: 2 } }),
         ).to.throw("Inconsistent selector: ");
       });
       it("throws on unrecognized operator", function () {
         expect(() =>
-          compileDocumentSelector({ _id: { $foo: [1, 2, 3] } })
+          compileDocumentSelector({ _id: { $foo: [1, 2, 3] } }),
         ).to.throw("Unrecognized operator: $foo");
       });
     });
@@ -282,7 +282,7 @@ describe("selector", function () {
 
       it("$in", function () {
         expect(() => compileDocumentSelector({ _id: { $in: 1 } })).to.throw(
-          "Argument to $in must be array"
+          "Argument to $in must be array",
         );
 
         const value1 = randomHex();
@@ -300,7 +300,7 @@ describe("selector", function () {
       });
       it("$all", function () {
         expect(() => compileDocumentSelector({ _id: { $all: 1 } })).to.throw(
-          "Argument to $all must be array"
+          "Argument to $all must be array",
         );
 
         const selector = compileDocumentSelector({
@@ -330,7 +330,7 @@ describe("selector", function () {
         expect(selector({ _id: 101 })).to.deep.equal(false);
 
         expect(selector({ _id: Number.MAX_SAFE_INTEGER * 2 })).to.deep.equal(
-          false
+          false,
         );
         expect(selector({ _id: Number.MAX_VALUE * 2 })).to.deep.equal(false);
       });
@@ -344,7 +344,7 @@ describe("selector", function () {
         expect(selector({ _id: 101 })).to.deep.equal(false);
 
         expect(selector({ _id: Number.MAX_SAFE_INTEGER * 2 })).to.deep.equal(
-          false
+          false,
         );
         expect(selector({ _id: Number.MAX_VALUE * 2 })).to.deep.equal(false);
       });
@@ -358,7 +358,7 @@ describe("selector", function () {
         expect(selector({ _id: 101 })).to.deep.equal(true);
 
         expect(selector({ _id: Number.MAX_SAFE_INTEGER * 2 })).to.deep.equal(
-          true
+          true,
         );
         expect(selector({ _id: Number.MAX_VALUE * 2 })).to.deep.equal(true);
       });
@@ -373,7 +373,7 @@ describe("selector", function () {
         expect(selector({ _id: 101 })).to.deep.equal(true);
 
         expect(selector({ _id: Number.MAX_SAFE_INTEGER * 2 })).to.deep.equal(
-          true
+          true,
         );
         expect(selector({ _id: Number.MAX_VALUE * 2 })).to.deep.equal(true);
       });
@@ -390,7 +390,7 @@ describe("selector", function () {
       });
       it("$nin", function () {
         expect(() => compileDocumentSelector({ _id: { $nin: 1 } })).to.throw(
-          "Argument to $nin must be array"
+          "Argument to $nin must be array",
         );
 
         const value1 = randomHex();
@@ -441,10 +441,10 @@ describe("selector", function () {
         const test = (info, $type, truthy, falsey) => {
           const selector = compileDocumentSelector({ _id: { $type } });
           truthy.forEach((_id) =>
-            expect(selector({ _id }), _id).to.equal(true)
+            expect(selector({ _id }), _id).to.equal(true),
           );
           falsey.forEach((_id) =>
-            expect(selector({ _id }), _id).to.equal(false)
+            expect(selector({ _id }), _id).to.equal(false),
           );
         };
 
@@ -456,49 +456,49 @@ describe("selector", function () {
           "number",
           1,
           [1, -1, 0, 1.1, Infinity],
-          [date, bin, "0", "1", {}, [], () => {}, true, false, null, undefined]
+          [date, bin, "0", "1", {}, [], () => {}, true, false, null, undefined],
         );
         test(
           "string",
           2,
           ["foo", "", " ", "1"],
-          [date, bin, 0, /foo/, {}, [], () => {}, true, false, null, undefined]
+          [date, bin, 0, /foo/, {}, [], () => {}, true, false, null, undefined],
         );
         test(
           "boolean",
           8,
           [true, false],
-          [date, bin, 0, 1, "", " ", "wqe", {}, () => {}, [], null, undefined]
+          [date, bin, 0, 1, "", " ", "wqe", {}, () => {}, [], null, undefined],
         );
         test(
           "array",
           4,
           [[[]]],
-          [date, bin, 0, 1, "", " ", "wqe", {}, null, undefined, () => {}]
+          [date, bin, 0, 1, "", " ", "wqe", {}, null, undefined, () => {}],
         );
         test(
           "regex",
           11,
           [/foo/],
-          [date, bin, 0, 1, "", " ", "wqe", {}, [], null, undefined, () => {}]
+          [date, bin, 0, 1, "", " ", "wqe", {}, [], null, undefined, () => {}],
         );
         test(
           "date",
           9,
           [new Date()],
-          [bin, Date, 0, 1, "", " ", "wqe", {}, [], null, undefined]
+          [bin, Date, 0, 1, "", " ", "wqe", {}, [], null, undefined],
         );
         test(
           "binary",
           5,
           [bin],
-          [date, 0, 1, "", " ", "wqe", {}, [], null, undefined]
+          [date, 0, 1, "", " ", "wqe", {}, [], null, undefined],
         );
         test(
           "object",
           3,
           [{}, new Custom()],
-          [date, 0, 1, "", " ", "wqe", [], null, undefined]
+          [date, 0, 1, "", " ", "wqe", [], null, undefined],
         );
       });
       it("$regex", function () {
@@ -508,7 +508,7 @@ describe("selector", function () {
               $regex: /pattern/,
               $options: "foo",
             },
-          })
+          }),
         ).to.throw("Only the i, m, and g regexp options are supported");
 
         // regex instance
@@ -562,15 +562,15 @@ describe("selector", function () {
     describe("logical operators", function () {
       it("throws on unrecognized operator", function () {
         expect(() => compileDocumentSelector({ $foo: 2 })).to.throw(
-          "Unrecognized logical operator: $foo"
+          "Unrecognized logical operator: $foo",
         );
       });
       it("$and", function () {
         expect(() => compileDocumentSelector({ $and: 1 })).to.throw(
-          "$and/$or/$nor must be nonempty array"
+          "$and/$or/$nor must be nonempty array",
         );
         expect(() => compileDocumentSelector({ $and: [] })).to.throw(
-          "$and/$or/$nor must be nonempty array"
+          "$and/$or/$nor must be nonempty array",
         );
 
         const selector = compileDocumentSelector({
@@ -584,10 +584,10 @@ describe("selector", function () {
       });
       it("$or", function () {
         expect(() => compileDocumentSelector({ $or: 1 })).to.throw(
-          "$and/$or/$nor must be nonempty array"
+          "$and/$or/$nor must be nonempty array",
         );
         expect(() => compileDocumentSelector({ $or: [] })).to.throw(
-          "$and/$or/$nor must be nonempty array"
+          "$and/$or/$nor must be nonempty array",
         );
 
         const selector = compileDocumentSelector({
@@ -601,10 +601,10 @@ describe("selector", function () {
       });
       it("$nor", function () {
         expect(() => compileDocumentSelector({ $nor: 1 })).to.throw(
-          "$and/$or/$nor must be nonempty array"
+          "$and/$or/$nor must be nonempty array",
         );
         expect(() => compileDocumentSelector({ $nor: [] })).to.throw(
-          "$and/$or/$nor must be nonempty array"
+          "$and/$or/$nor must be nonempty array",
         );
 
         const selector = compileDocumentSelector({

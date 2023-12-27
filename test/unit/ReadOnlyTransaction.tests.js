@@ -15,10 +15,10 @@ describe("ReadOnlyTransaction", function () {
     expect(transaction.findOne("foo", result)).to.deep.equal(result);
 
     expect(() => transaction.upsert()).to.throw(
-      "Cannot write outside of a WriteTransaction"
+      "Cannot write outside of a WriteTransaction",
     );
     expect(() => transaction.del()).to.throw(
-      "Cannot write outside of a WriteTransaction"
+      "Cannot write outside of a WriteTransaction",
     );
   });
 
@@ -34,7 +34,7 @@ describe("ReadOnlyTransaction", function () {
     });
 
     expect(transaction.canPushTransaction(new WriteTransaction())).to.equal(
-      false
+      false,
     );
   });
 });

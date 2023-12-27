@@ -75,7 +75,7 @@ module.exports = function () {
       return this.testFilter(
         { a: { $in: ["Alice", "Charlie"] } },
         ["1", "2"],
-        done
+        done,
       );
     });
 
@@ -99,7 +99,7 @@ module.exports = function () {
       return this.testFilter(
         { a: { $regex: "A", $options: "i" } },
         ["1", "2"],
-        done
+        done,
       );
     });
 
@@ -290,7 +290,7 @@ module.exports = function () {
             "didUpdateProps " +
               JSON.stringify(this.props) +
               ", " +
-              JSON.stringify(prevProps)
+              JSON.stringify(prevProps),
           );
         },
       });
@@ -397,7 +397,7 @@ module.exports = function () {
       let captured_stack = null;
       this.db.on(
         "change",
-        (changeRecords) => (captured_stack = new Error("ouch").stack)
+        (changeRecords) => (captured_stack = new Error("ouch").stack),
       );
 
       this.col.upsert({ _id: 1, name: "x" });
@@ -421,8 +421,8 @@ module.exports = function () {
               result1.push(result._id);
             }
             return result1;
-          })()
-        ).includes(needle))
+          })(),
+        ).includes(needle)),
       );
       assert(
         ((needle1 = "2"),
@@ -433,8 +433,8 @@ module.exports = function () {
               result2.push(result._id);
             }
             return result2;
-          })()
-        ).includes(needle1))
+          })(),
+        ).includes(needle1)),
       );
       return done();
     });
@@ -454,8 +454,8 @@ module.exports = function () {
               result1.push(result._id);
             }
             return result1;
-          })()
-        ).includes(needle))
+          })(),
+        ).includes(needle)),
       );
       assert(
         ((needle1 = "2"),
@@ -466,8 +466,8 @@ module.exports = function () {
               result2.push(result._id);
             }
             return result2;
-          })()
-        ).includes(needle1))
+          })(),
+        ).includes(needle1)),
       );
       return done();
     });
@@ -591,7 +591,7 @@ module.exports = function () {
       return this.testFilter(
         { "c.arrint": { $in: [1, 3] } },
         ["1", "2", "3"],
-        done
+        done,
       );
     });
   });
@@ -618,7 +618,7 @@ module.exports = function () {
         ["1", "2"],
         () => {
           return this.testFilter({ c: { $elemMatch: { x: 1 } } }, ["1"], done);
-        }
+        },
       );
     });
   });
@@ -647,9 +647,9 @@ module.exports = function () {
           return this.testFilter(
             { c: { $elemMatch: { arrstr: { $in: ["d", "e"] } } } },
             ["3"],
-            done
+            done,
           );
-        }
+        },
       );
     });
   });
@@ -676,7 +676,7 @@ module.exports = function () {
       return this.testFilter(
         { textarr: { $in: ["a", ["b", "c"]] } },
         ["1", "2"],
-        done
+        done,
       );
     });
   });

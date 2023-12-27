@@ -177,7 +177,7 @@ const processNearOperator = function (selector, list) {
           geo.coordinates[1],
           geo.coordinates[0],
           doc[key].coordinates[1],
-          doc[key].coordinates[0]
+          doc[key].coordinates[0],
         ),
       }));
 
@@ -190,7 +190,7 @@ const processNearOperator = function (selector, list) {
       // Filter by maxDistance
       if (value["$near"]["$maxDistance"]) {
         distances = distances.filter(
-          (item) => item.distance <= value["$near"]["$maxDistance"]
+          (item) => item.distance <= value["$near"]["$maxDistance"],
         );
       }
 
@@ -325,7 +325,7 @@ exports.regularizeUpsert = function regularizeUpsert(
   docs,
   bases,
   success,
-  error
+  error,
 ) {
   // Handle case of bases not present
   if (typeof bases === "function") {

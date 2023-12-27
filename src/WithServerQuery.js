@@ -86,11 +86,11 @@ const WithServerQuery = {
     const cache = this;
     invariant(
       spec.hasOwnProperty("statics"),
-      "spec must have statics property"
+      "spec must have statics property",
     );
     invariant(
       spec.statics.hasOwnProperty("getKey"),
-      "statics.getKey must be a function"
+      "statics.getKey must be a function",
     );
 
     const typeId = numTypes++;

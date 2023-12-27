@@ -59,7 +59,7 @@ const compileValueSelector = (valueSelector) => {
     return (value) =>
       isArray(value)
         ? _anyIfArrayPlus(value, (x) =>
-            LocalCollection._f._equal(valueSelector, x)
+            LocalCollection._f._equal(valueSelector, x),
           )
         : false;
   }
@@ -157,7 +157,7 @@ const VALUE_OPERATORS = {
     return (value) =>
       isArray(value)
         ? operand.every((opEl) =>
-            value.some((valEl) => LocalCollection._f._equal(opEl, valEl))
+            value.some((valEl) => LocalCollection._f._equal(opEl, valEl)),
           )
         : false;
   },

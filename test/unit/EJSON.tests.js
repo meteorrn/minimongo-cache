@@ -56,7 +56,7 @@ describe("EJSON", function () {
       EJSON.addType(type, factory); // should pass
 
       expect(() => EJSON.addType(type, factory)).to.throw(
-        `Type ${type} already present`
+        `Type ${type} already present`,
       );
     });
   });
@@ -160,7 +160,7 @@ describe("EJSON", function () {
     it("serializes an ESJON-compatible type to string", function () {
       const str = EJSON.stringify(new Distance(10, "m"));
       expect(str).to.equal(
-        '{"$type":"Distance","$value":{"value":10,"unit":"m"}}'
+        '{"$type":"Distance","$value":{"value":10,"unit":"m"}}',
       );
     });
     it("serializes non-ESJON-compatible type to string like JSON.stringify", function () {
