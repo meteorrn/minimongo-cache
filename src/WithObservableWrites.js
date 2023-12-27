@@ -5,5 +5,4 @@ const WithObservableWrites = {
   },
 };
 
-
 module.exports = WithObservableWrites;

@@ -21,7 +21,7 @@ const { hasOwn, each } = require("./tools");
 
 module.exports = MemoryDb = class MemoryDb extends EventEmitter {
   constructor() {
-    super()
+    super();
     this.collections = {};
     this.debug = true;
     this.batchedUpdates = (cb) => cb();
